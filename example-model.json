@@ -1,0 +1,15 @@
+{
+    "trip_proposal": {
+        "user_id": "1",
+        "trip_id": "1",
+        "location": {
+            "name": "London"
+        },
+        "proposed_date": "2023-01-01",
+        "start_date": "2023-01-01",
+        "end_date": "2023-01-01",
+        "weather_forcast": {
+            // weather service returned data
+        }
+    }
+}
