@@ -1,8 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from .utils import get_uuid
 
 class CustomUser(AbstractUser):
-    external_user_id = models.UUIDField(editable=False, unique=True)
+    external_user_id = models.UUIDField(editable=False, unique=True, default=get_uuid())
 
 class Trip(models.Model):
     trip_id = models.UUIDField(editable=False, unique=True)
