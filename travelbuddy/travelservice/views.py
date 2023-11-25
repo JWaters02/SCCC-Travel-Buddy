@@ -5,10 +5,14 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from .models import Trip, CustomUser
 from .serializers import TripSerializer, UserRegistrationSerializer, UserListSerializer
+import logging
+
+logger = logging.getLogger(__name__)
 
 class UserRegistrationView(APIView):
     def post(self, request):
         serializer = UserRegistrationSerializer(data=request.data)
+        logger.info(f"UserRegistrationView: {request.data}")
         if serializer.is_valid():
             user = serializer.save()
             token, created = Token.objects.get_or_create(user=user)
@@ -24,6 +28,14 @@ class UserList(APIView):
         users = CustomUser.objects.all()
         serializer = UserListSerializer(users, many=True)
         return Response(serializer.data)
+    
+class UserDelete(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, format=None):
+        user = CustomUser.objects.get(user_id=request.data['user_id'])
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 class TripList(APIView):
     permission_classes = [IsAuthenticated]
