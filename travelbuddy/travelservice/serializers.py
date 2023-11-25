@@ -2,18 +2,36 @@ from rest_framework import serializers
 from .models import CustomUser, Trip
 from .utils import get_uuid
 
-class CustomUserSerializer(serializers.ModelSerializer):
+class UserRegistrationSerializer(serializers.ModelSerializer):
+    password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)
+
     class Meta:
         model = CustomUser
-        fields = ['username', 'email', 'external_user_id']
+        fields = ['username', 'email', 'password', 'password2', 'user_id']
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
 
     def create(self, validated_data):
-        external_user_id = get_uuid()
-        if external_user_id is None:
-            raise ValueError("Unable to generate UUID for external_user_id")
+        password = validated_data['password']
+        password2 = validated_data.pop('password2')
+        if password != password2:
+            raise serializers.ValidationError({'password': 'Passwords must match.'})
+        
+        user_id = get_uuid()
+        if user_id is None:
+            raise ValueError("Unable to generate UUID for user_id")
         else:
-            validated_data['external_user_id'] = external_user_id
+            validated_data['user_id'] = user_id
             return CustomUser.objects.create(**validated_data)
+        
+class UserListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['username', 'email', 'user_id']
+
+    def create(self, validated_data):
+        return CustomUser.objects.create(**validated_data)
 
 class TripSerializer(serializers.ModelSerializer):
     class Meta:

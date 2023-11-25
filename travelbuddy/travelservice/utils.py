@@ -41,7 +41,7 @@ def get_uuid():
     return None
 
 def get_weather(location):
-    url = "https://api.openweathermap.org/data/2.5/weather"
+    url = "https://api.openweathermap.org/data/2.5/forcast"
     payload = {
         "q": location,
         "appid": WEATHER_API_KEY
