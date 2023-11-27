@@ -5,6 +5,14 @@ import MapProvider from "./components/MapProvider";
 import Cookies from "js-cookie";
 import './App.css';
 
+window.addEventListener('unhandledrejection', function (event) {
+  if (event.reason && event.reason.message && event.reason.message.includes('is undefined')) {
+    console.warn('Unhandled Google Maps API error:', event.reason);
+    event.preventDefault();
+    document.querySelector('iframe').style.display = 'none';
+  }
+});
+
 class App extends Component {
   constructor(props) {
     super(props);

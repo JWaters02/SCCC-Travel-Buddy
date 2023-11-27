@@ -1,32 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import MapContext from '../contexts/MapContext';
-import ErrorBoundary from './ErrorBoundary';
 
 const MapProvider = ({ children }) => {
-    const [map, setMap] = useState(null);
+    const [isScriptLoaded, setIsScriptLoaded] = useState(false);
 
     useEffect(() => {
+        if (window.google && window.google.maps) {
+            setIsScriptLoaded(true);
+            return;
+        }
+
+        window.initMap = () => setIsScriptLoaded(true);
+
         const script = document.createElement('script');
-        script.src = `https://maps.googleapis.com/maps/api/js?v=weekly&key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}&callback=initMap`;
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}&callback=initMap`;
         script.async = true;
+        script.defer = true;
         document.head.appendChild(script);
 
-        window.initMap = () => {
-            setMap(new window.google.maps.Map(document.createElement('div')));
-        };
-
         return () => {
-            document.head.removeChild(script);
             window.initMap = undefined;
+            document.head.removeChild(script);
         };
     }, []);
 
     return (
-        <ErrorBoundary>
-            <MapContext.Provider value={map}>
-                {children}
-            </MapContext.Provider>
-        </ErrorBoundary>
+        <MapContext.Provider value={isScriptLoaded}>
+            {children}
+        </MapContext.Provider>
     );
 };
 
