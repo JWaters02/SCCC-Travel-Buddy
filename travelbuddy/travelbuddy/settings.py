@@ -133,8 +133,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'travelservice.CustomUser'
 
 # CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOWED_ORIGINS = [
+CORS_ORIGIN_WHITELIST = [
     'http://127.0.0.1:5500',
+    'http://localhost:3000',
 ]
 
 LOGGING = {
