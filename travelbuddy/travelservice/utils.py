@@ -40,26 +40,62 @@ def get_uuid():
 
     return None
 
-def get_weather(location):
-    url = "https://api.openweathermap.org/data/2.5/forcast"
+def get_weather(location, start_date, end_date):
+    # 1. convert the dates to unix timestamp
+    # 2. make a call to the openweather forecase api using the location and api key
+    # 3. check if any of the dates in the response json are between start and end dates
+    # 4. if any of them are, pick the one closest to start date time
+    # 5. return a json including the temp, feels like, humidity, description and wind speed
+    # 6. if the end date is before any of them, then return empty
+    # 7. if the start and end dates are after any of them, then return the last entry
+    
+    start_timestamp = int(start_date.timestamp())
+    end_timestamp = int(end_date.timestamp())
+
+    url = "https://api.openweathermap.org/data/2.5/forecast"
     payload = {
         "q": location,
-        "appid": WEATHER_API_KEY
+        "appid": WEATHER_API_KEY,
+        "units": "metric"
     }
 
     try:
         response = requests.get(url, params=payload)
         response.raise_for_status()
-        data = response.json()
+        forecast_data = response.json()
+        relevant_forecast = None
 
-        if 'weather' in data:
-            return data['weather'][0]['description']
+        # Check if dates in the response are between the start and end dates
+        for forecast in forecast_data['list']:
+            forecast_time = forecast['dt']
+            if start_timestamp <= forecast_time <= end_timestamp:
+                relevant_forecast = forecast
+                break
+            elif forecast_time > end_timestamp:
+                return {}  # End date is before any forecast dates
+        
+        if relevant_forecast is None:
+            # No forecasts within the range, check if start and end dates are after all forecasts
+            last_forecast_time = forecast_data['list'][-1]['dt']
+            if start_timestamp > last_forecast_time and end_timestamp > last_forecast_time:
+                relevant_forecast = forecast_data['list'][-1]
+
+        if relevant_forecast:
+            weather_info = {
+                'temp': relevant_forecast['main']['temp'],
+                'feels_like': relevant_forecast['main']['feels_like'],
+                'humidity': relevant_forecast['main']['humidity'],
+                'description': relevant_forecast['weather'][0]['description'],
+                'wind_speed': relevant_forecast['wind']['speed']
+            }
+            logger.info(f"get_weather: {weather_info}")
+            return weather_info
         else:
-            raise ValueError("Malformed response from openweathermap.org")
-    
+            return None
+
     except requests.RequestException as e:
         logger.error(f"Network-related error when contacting openweathermap.org: {e}")
-    except ValueError as ve:
-        logger.error(f"Error in processing openweathermap.org response: {ve}")
-
-    return None
+        return None
+    except Exception as e:
+        logger.error(f"Error in processing or fetching the weather data: {e}")
+        return None

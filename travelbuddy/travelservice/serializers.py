@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate
 from rest_framework import serializers
 from .models import CustomUser, Trip
-from .utils import get_uuid
+from .utils import get_uuid, get_weather
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)
@@ -42,12 +42,12 @@ class UserLoginSerializer(serializers.Serializer):
             raise serializers.ValidationError("Invalid username or password.")
         return {'user': user}
 
-class UserListSerializer(serializers.ModelSerializer):
+class UserListSerializer(serializers.Serializer):
     class Meta:
         model = CustomUser
         fields = ['username', 'email', 'user_id']
 
-    def create(self, validated_data):
+    def get(self, validated_data):
         return CustomUser.objects.create(**validated_data)
 
 class TripSerializer(serializers.ModelSerializer):
@@ -59,6 +59,11 @@ class TripSerializer(serializers.ModelSerializer):
         trip_id = get_uuid()
         if trip_id is None:
             raise ValueError("Unable to generate UUID for trip_id")
-        else:
-            validated_data['trip_id'] = trip_id
-            return Trip.objects.create(**validated_data)
+        
+        weather = get_weather(validated_data['location'], validated_data['start_date'], validated_data['end_date'])
+        if weather is None:
+            raise ValueError("Unable to retrieve weather forcast")
+        
+        validated_data['weather_forcast'] = weather
+        validated_data['trip_id'] = trip_id
+        return Trip.objects.create(**validated_data)

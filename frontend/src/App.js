@@ -4,42 +4,13 @@ import Login from "./components/Login";
 import Cookies from "js-cookie";
 import './App.css';
 
-// const tempTrips = [
-//   {
-//     trip_id: '00000000-0000-0000-0000-000000000000',
-//     user_id: '00000000-0000-0000-0000-000000000000',
-//     tripName: 'Trip 1',
-//     location: 'London',
-//     startDate: '2024-01-01T00:00:00',
-//     endDate: '2024-01-01T00:00:00',
-//     weather_forcast: {
-//       temp: 0,
-//       description: 'Sunny',
-//       wind_speed: 0,
-//     }
-//   },
-//   {
-//     trip_id: '10000000-0000-0000-0000-000000000000',
-//     user_id: '10000000-0000-0000-0000-000000000000',
-//     tripName: 'Trip 2',
-//     location: 'Nottingham',
-//     startDate: '2024-01-01T00:00:00',
-//     endDate: '2023-01-01T00:00:00',
-//     weather_forcast: {
-//       temp: 10,
-//       description: 'Sunny',
-//       wind_speed: 50,
-//     }
-//   },
-// ]
-
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
       trips: [],
       isPastDate: false,
-      isLoggedin: false,
+      isLoggedIn: false,
       currentDate: new Date().toISOString().slice(0, 19),
       modal: false,
       activeItem: {
@@ -74,6 +45,7 @@ class App extends Component {
   };
 
   handleLoginSuccess = () => {
+    console.log("Login successful");
     this.setState({ isLoggedIn: true });
     this.refreshList();
   };  
@@ -105,19 +77,19 @@ class App extends Component {
     return (
       <li key={item.trip_id} 
       className={`list-group-item d-flex justify-content-between align-items-center ${
-        this.isPastDate(item.endDate) ? "bg-light-red" : "" }`}>
+        this.isPastDate(item.end_date) ? "bg-light-red" : "" }`}>
         <span>
           <span className="mr-2">
-            {item.tripName}:
+            {item.trip_name}:
           </span>
           <span className="mr-2">
             {item.location},
           </span>
           <span className="mr-2">
-            {item.startDate}
+            {item.start_date}
           </span>
           <span className="mr-2">
-            {item.endDate}
+            {item.end_date}
           </span>
         </span>
         <span>
@@ -139,11 +111,11 @@ class App extends Component {
   };
 
   render() {
-    const { trips, isLoggedin } = this.state;
+    const { trips, isLoggedIn } = this.state;
     console.log(trips);
-    console.log(isLoggedin);
+    console.log(isLoggedIn);
 
-    if (!isLoggedin) {
+    if (!isLoggedIn) {
       return <Login onLoginSuccess={this.handleLoginSuccess} />;
     }
 

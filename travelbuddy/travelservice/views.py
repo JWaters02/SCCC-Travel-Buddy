@@ -48,7 +48,7 @@ class UserDelete(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 class TripList(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
         trips = Trip.objects.all()
