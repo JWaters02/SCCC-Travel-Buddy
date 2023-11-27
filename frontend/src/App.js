@@ -12,13 +12,12 @@ class App extends Component {
       trips: [],
       isPastDate: false,
       isLoggedIn: false,
-      markerLatitude: null,
-      markerLongitude: null,
       currentDate: new Date().toISOString().slice(0, 19),
       modal: false,
       activeItem: {
         name: "",
-        location: "",
+        longitude: 0.0,
+        latitude: 0.0,
         startDate: "",
         endDate: "",
       }
@@ -55,10 +54,6 @@ class App extends Component {
     console.log("Login successful");
     this.setState({ isLoggedIn: true });
     this.refreshList();
-  };
-
-  handleMarkerPositionChange = (latitude, longitude) => {
-    this.setState({ markerLatitude: latitude, markerLongitude: longitude });
   };
 
   handleSubmit = (item) => {
@@ -138,18 +133,16 @@ class App extends Component {
             <div className="card p-3">
               <div className="mb-4">
                 <p>Current Date: {this.state.currentDate}</p>
-                <button className="btn btn-primary">
+                <button 
+                  className="btn btn-primary"
+                  onClick={this.createItem}
+                >
                   Add trip
                 </button>
               </div>
               <ul className="list-group list-group-flush border-top-0">
                 {trips.map(this.renderItems)}
               </ul>
-              <div>
-                <p>Marker Latitude: {this.state.markerLatitude}</p>
-                <p>Marker Longitude: {this.state.markerLongitude}</p>
-              </div>
-              <Map onMarkerPlaced={this.handleMarkerPositionChange} />
             </div>
           </div>
         </div>

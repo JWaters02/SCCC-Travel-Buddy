@@ -1,4 +1,4 @@
-import React, { useState, Component } from 'react';
+import React, { Component } from 'react';
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 
 class Map extends Component {
@@ -21,6 +21,20 @@ class Map extends Component {
         lat: 52.954,
         lng: -1.252
     };
+
+    componentDidUpdate(prevProps) {
+        // Check if the new props for latitude or longitude are different
+        // and if they are valid numbers
+        if ((!isNaN(this.props.latitude) && this.props.latitude !== prevProps.latitude) ||
+            (!isNaN(this.props.longitude) && this.props.longitude !== prevProps.longitude)) {
+            this.setState({
+                markerPosition: {
+                    lat: this.props.latitude,
+                    lng: this.props.longitude,
+                },
+            });
+        }
+    }
 
     onMapClick = (e) => {
         const lat = e.latLng.lat();
