@@ -40,3 +40,8 @@
 .bg-light-red {
   background-color: #ffcccc;
 }
+
+iframe
+{
+    display: none;
+}

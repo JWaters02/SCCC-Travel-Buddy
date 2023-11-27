@@ -6,7 +6,7 @@ import Cookies from "js-cookie";
 import './App.css';
 
 window.addEventListener('unhandledrejection', function (event) {
-  if (event.reason && event.reason.message && event.reason.message.includes('is undefined')) {
+  if (event.reason.message.toLowerCase().includes('tba') || event.reason.message.toLowerCase().includes('is undefined')) {
     console.warn('Unhandled Google Maps API error:', event.reason);
     event.preventDefault();
     document.querySelector('iframe').style.display = 'none';
@@ -41,7 +41,6 @@ class App extends Component {
 
   refreshList = () => {
     const token = Cookies.get('token');
-    console.log(token);
     fetch("/api/trips/", {
       headers: {
         'Authorization': `Token ${token}`
@@ -125,9 +124,6 @@ class App extends Component {
 
   render() {
     const { trips, isLoggedIn, currentDate, modal, activeItem } = this.state;
-    console.log(trips);
-    console.log(isLoggedIn);
-    console.log(process.env.GOOGLE_MAPS_API_KEY);
 
     if (!isLoggedIn) {
       return <Login onLoginSuccess={this.handleLoginSuccess} />;
