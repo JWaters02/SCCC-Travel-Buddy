@@ -2,15 +2,16 @@ import React, { Component } from "react";
 import logo from './logo.svg';
 import './App.css';
 
-const API = "http://localhost:8000/api";
+const API = "http://localhost:8000/";
 
 const tempTrips = [
   {
     trip_id: '00000000-0000-0000-0000-000000000000',
     user_id: '00000000-0000-0000-0000-000000000000',
+    tripName: 'Trip 1',
     location: 'London',
-    start_date: '2024-01-01 00:00:00Z',
-    end_date: '2024-01-01 00:00:00Z',
+    startDate: '2024-01-01T00:00:00',
+    endDate: '2024-01-01T00:00:00',
     weather_forcast: {
       temp: 0,
       description: 'Sunny',
@@ -20,9 +21,10 @@ const tempTrips = [
   {
     trip_id: '10000000-0000-0000-0000-000000000000',
     user_id: '10000000-0000-0000-0000-000000000000',
+    tripName: 'Trip 2',
     location: 'Nottingham',
-    start_date: '2024-01-01 00:00:00Z',
-    end_date: '2024-01-01 00:00:00Z',
+    startDate: '2024-01-01T00:00:00',
+    endDate: '2023-01-01T00:00:00',
     weather_forcast: {
       temp: 10,
       description: 'Sunny',
@@ -35,21 +37,37 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      location: "",
-      start_date: "",
-      end_date: "",
+      tripName: "",
+      startDate: "",
+      endDate: "",
       trips: tempTrips,
+      isPastDate: false,
+      currentDate: new Date().toISOString().slice(0, 19),
     };
+  }
+
+  isPastDate = (endDate) => {
+    return new Date(endDate) < new Date(this.state.currentDate);
   }
 
   renderItems = (item) => {
     return (
       <li key={item.trip_id} 
-      className="list-group-item d-flex justify-content-between align-items-center">
+      className={`list-group-item d-flex justify-content-between align-items-center ${
+        this.isPastDate(item.endDate) ? "bg-light-red" : "" }`}>
         <span>
-          {item.location}
-          : {item.start_date} 
-          - {item.end_date}
+          <span className="mr-2">
+            {item.tripName}:
+          </span>
+          <span className="mr-2">
+            {item.location},
+          </span>
+          <span className="mr-2">
+            {item.startDate}
+          </span>
+          <span className="mr-2">
+            {item.endDate}
+          </span>
         </span>
         <span>
           <button className="btn btn-secondary mr-2">
@@ -65,6 +83,7 @@ class App extends Component {
 
   render() {
     const { trips } = this.state;
+
     return (
       <main className="container">
         <h1 className="text-white text text-center my-4">Trip Manager</h1>
@@ -72,6 +91,7 @@ class App extends Component {
           <div className="col-md-6 col-sm-10 mx-auto p-0">
             <div className="card p-3">
               <div className="mb-4">
+                <p>Current Date: {this.state.currentDate}</p>
                 <button className="btn btn-primary">
                   Add trip
                 </button>

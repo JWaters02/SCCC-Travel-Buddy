@@ -7,8 +7,9 @@ class CustomUser(AbstractUser):
 class Trip(models.Model):
     trip_id = models.UUIDField(primary_key=True, editable=True, unique=True)
     user_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    trip_name = models.CharField(max_length=100, default='')
     location = models.CharField(max_length=100)
     proposed_date = models.DateTimeField(auto_now_add=True)
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
-    weather_forcast = models.TextField(blank=True)
+    weather_forcast = models.JSONField(blank=True)

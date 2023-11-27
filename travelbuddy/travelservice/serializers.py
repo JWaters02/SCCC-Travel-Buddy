@@ -36,7 +36,7 @@ class UserListSerializer(serializers.ModelSerializer):
 class TripSerializer(serializers.ModelSerializer):
     class Meta:
         model = Trip
-        fields = ['trip_id', 'user_id', 'location', 'proposed_date', 'start_date', 'end_date', 'weather_forcast']
+        fields = ['trip_id', 'user_id', 'trip_name', 'location', 'proposed_date', 'start_date', 'end_date', 'weather_forcast']
 
     def create(self, validated_data):
         trip_id = get_uuid()
