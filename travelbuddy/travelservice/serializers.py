@@ -1,7 +1,10 @@
 from django.contrib.auth import authenticate
 from rest_framework import serializers
+import logging
 from .models import CustomUser, Trip
-from .utils import get_uuid, get_weather
+from .utils import get_uuid, get_weather, get_location
+
+logger = logging.getLogger(__name__)
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)
@@ -53,17 +56,24 @@ class UserListSerializer(serializers.Serializer):
 class TripSerializer(serializers.ModelSerializer):
     class Meta:
         model = Trip
-        fields = ['trip_id', 'user_id', 'trip_name', 'location', 'proposed_date', 'start_date', 'end_date', 'weather_forcast']
+        fields = ['trip_id', 'user_id', 'trip_name', 'location', 'latitude', 'longitude', 'proposed_date', 'start_date', 'end_date', 'weather_forcast']
 
     def create(self, validated_data):
         trip_id = get_uuid()
         if trip_id is None:
             raise ValueError("Unable to generate UUID for trip_id")
         
-        weather = get_weather(validated_data['location'], validated_data['start_date'], validated_data['end_date'])
-        if weather is None:
-            raise ValueError("Unable to retrieve weather forcast")
+        location = get_location(validated_data['latitude'], validated_data['longitude'])
+        if location is None:
+            logger.error(f"Unable to retrieve location data for {validated_data['latitude']}, {validated_data['longitude']}")
+            location = f"{validated_data['latitude']}, {validated_data['longitude']}"
         
-        validated_data['weather_forcast'] = weather
+        weather = get_weather(validated_data['latitude'], validated_data['longitude'], validated_data['start_date'], validated_data['end_date'])
+        if weather is None:
+            logger.error(f"Unable to retrieve weather data for {validated_data['latitude']}, {validated_data['longitude']}")
+            return "Unable to retrieve weather data"
+        
         validated_data['trip_id'] = trip_id
+        validated_data['location'] = location
+        validated_data['weather_forcast'] = weather
         return Trip.objects.create(**validated_data)

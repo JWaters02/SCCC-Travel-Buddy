@@ -40,7 +40,31 @@ def get_uuid():
 
     return None
 
-def get_weather(location, start_date, end_date):
+def get_location(lat, lon):
+    url = "http://api.openweathermap.org/geo/1.0/reverse"
+    payload = {
+        "lat": lat,
+        "lon": lon,
+        "limit": 1,
+        "appid": WEATHER_API_KEY
+    }
+
+    try:
+        response = requests.get(url, params=payload)
+        response.raise_for_status()
+        data = response.json()
+        if len(data) > 0:
+            return f"{data[0]['name']}, {data[0]['state']}, {data[0]['country']}"
+        else:
+            return None
+    except requests.RequestException as e:
+        logger.error(f"Network-related error when contacting openweathermap.org: {e}")
+        return None
+    except Exception as e:
+        logger.error(f"Error in processing or fetching the location data: {e}")
+        return None
+
+def get_weather(lat, lon, start_date, end_date):
     # 1. convert the dates to unix timestamp
     # 2. make a call to the openweather forecase api using the location and api key
     # 3. check if any of the dates in the response json are between start and end dates
@@ -54,7 +78,8 @@ def get_weather(location, start_date, end_date):
 
     url = "https://api.openweathermap.org/data/2.5/forecast"
     payload = {
-        "q": location,
+        "lat": lat,
+        "lon": lon,
         "appid": WEATHER_API_KEY,
         "units": "metric"
     }
@@ -72,6 +97,7 @@ def get_weather(location, start_date, end_date):
                 relevant_forecast = forecast
                 break
             elif forecast_time > end_timestamp:
+                logger.info(f"get_weather: end date is before any forecast dates")
                 return {}  # End date is before any forecast dates
         
         if relevant_forecast is None:

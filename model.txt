@@ -19,9 +19,10 @@
 {
     "user_id": "ead8dce4-bc15-4959-bc08-007738ab6de0",
     "trip_name": "run",
-    "location": "London",
-    "start_date": "2023-01-15T09:00:00Z",
-    "end_date": "2023-01-20T20:00:00Z"
+    "latitude": "51.5074",
+    "longitude": "0.1278",
+    "start_date": "2023-11-25T09:00:00Z",
+    "end_date": "2023-11-30T20:00:00Z"
 }
 
 -- register POST
