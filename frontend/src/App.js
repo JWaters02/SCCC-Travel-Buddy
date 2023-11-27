@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import Modal from "./components/Modal";
 import Login from "./components/Login";
+import Map from "./components/Map";
 import Cookies from "js-cookie";
 import './App.css';
 
@@ -11,6 +12,8 @@ class App extends Component {
       trips: [],
       isPastDate: false,
       isLoggedIn: false,
+      markerLatitude: null,
+      markerLongitude: null,
       currentDate: new Date().toISOString().slice(0, 19),
       modal: false,
       activeItem: {
@@ -23,6 +26,9 @@ class App extends Component {
   }
 
   componentDidMount() {
+    if (Cookies.get('token')) {
+      this.setState({ isLoggedIn: true });
+    }
     this.refreshList();
   }
 
@@ -37,7 +43,8 @@ class App extends Component {
       .then((response) => response.json())
       .then((data) => {
         this.setState({ trips: data });
-      });
+      })
+      .catch((error) => console.log(error));
   }
 
   toggle = () => {
@@ -48,12 +55,16 @@ class App extends Component {
     console.log("Login successful");
     this.setState({ isLoggedIn: true });
     this.refreshList();
-  };  
+  };
+
+  handleMarkerPositionChange = (latitude, longitude) => {
+    this.setState({ markerLatitude: latitude, markerLongitude: longitude });
+  };
 
   handleSubmit = (item) => {
     this.toggle();
 
-    
+
   };
 
   handleDelete = (item) => {
@@ -75,9 +86,8 @@ class App extends Component {
 
   renderItems = (item) => {
     return (
-      <li key={item.trip_id} 
-      className={`list-group-item d-flex justify-content-between align-items-center ${
-        this.isPastDate(item.end_date) ? "bg-light-red" : "" }`}>
+      <li key={item.trip_id}
+        className={`list-group-item d-flex justify-content-between align-items-center ${this.isPastDate(item.end_date) ? "bg-light-red" : ""}`}>
         <span>
           <span className="mr-2">
             {item.trip_name}:
@@ -93,13 +103,13 @@ class App extends Component {
           </span>
         </span>
         <span>
-          <button 
+          <button
             className="btn btn-secondary mr-2"
             onClick={() => this.editItem(item)}
           >
             Edit
           </button>
-          <button 
+          <button
             className="btn btn-danger"
             onClick={() => this.handleDelete(item)}
           >
@@ -111,11 +121,12 @@ class App extends Component {
   };
 
   render() {
-    const { trips, isLoggedIn } = this.state;
+    const { trips } = this.state;
     console.log(trips);
-    console.log(isLoggedIn);
+    console.log(this.state.isLoggedIn);
+    console.log(process.env.GOOGLE_MAPS_API_KEY);
 
-    if (!isLoggedIn) {
+    if (!this.state.isLoggedIn) {
       return <Login onLoginSuccess={this.handleLoginSuccess} />;
     }
 
@@ -132,8 +143,13 @@ class App extends Component {
                 </button>
               </div>
               <ul className="list-group list-group-flush border-top-0">
-                  {trips.map(this.renderItems)}
+                {trips.map(this.renderItems)}
               </ul>
+              <div>
+                <p>Marker Latitude: {this.state.markerLatitude}</p>
+                <p>Marker Longitude: {this.state.markerLongitude}</p>
+              </div>
+              <Map onMarkerPlaced={this.handleMarkerPositionChange} />
             </div>
           </div>
         </div>

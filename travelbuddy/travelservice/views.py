@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
 from .models import Trip, CustomUser
 from .serializers import TripSerializer, UserRegistrationSerializer, UserLoginSerializer, UserListSerializer
 import logging
@@ -35,14 +36,35 @@ class UserList(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
+        if not request.user.is_superuser and not request.user.is_staff:
+            return Response(status=status.HTTP_403_FORBIDDEN)
         users = CustomUser.objects.all()
         serializer = UserListSerializer(users, many=True)
         return Response(serializer.data)
     
-class UserDelete(APIView):
-    permission_classes = [IsAuthenticated]
-
+    def put(self, request, format=None):
+        if not request.user.is_superuser and not request.user.is_staff:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        user = CustomUser.objects.get(user_id=request.data['user_id'])
+        serializer = UserListSerializer(user, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def patch(self, request, format=None):
+        if not request.user.is_superuser and not request.user.is_staff:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        user = CustomUser.objects.get(user_id=request.data['user_id'])
+        serializer = UserListSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
     def delete(self, request, format=None):
+        if not request.user.is_superuser and not request.user.is_staff:
+            return Response(status=status.HTTP_403_FORBIDDEN)
         user = CustomUser.objects.get(user_id=request.data['user_id'])
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

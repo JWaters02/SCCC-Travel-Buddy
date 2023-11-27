@@ -20,7 +20,7 @@ from travelservice import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/trips/', views.TripList.as_view(), name='create-trips'),
+    path('api/trips/', views.TripList.as_view(), name='trips'),
     path('api/users/', views.UserList.as_view(), name='user-list'),
     path('api/register/', views.UserRegistrationView.as_view(), name='register'),
     path('api/login/', views.UserLoginView.as_view(), name='login'),
