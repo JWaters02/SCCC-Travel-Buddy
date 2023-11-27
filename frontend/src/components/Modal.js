@@ -30,7 +30,7 @@ export default class CustomModal extends Component {
 
         return (
             <Modal isOpen={true} toggle={toggle}>
-                <ModalHeader toggle={toggle}>Trip</ModalHeader>
+                <ModalHeader toggle={toggle}>Trips</ModalHeader>
                 <ModalBody>
                     <Form>
                         <FormGroup>

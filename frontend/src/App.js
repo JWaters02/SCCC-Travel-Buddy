@@ -1,8 +1,7 @@
 import React, { Component } from "react";
-import logo from './logo.svg';
+import Modal from "./components/Modal";
 import './App.css';
-
-const API = "http://localhost:8000/";
+import axios from "axios";
 
 const tempTrips = [
   {
@@ -43,8 +42,38 @@ class App extends Component {
       trips: tempTrips,
       isPastDate: false,
       currentDate: new Date().toISOString().slice(0, 19),
+      modal: false,
+      activeItem: {
+        name: "",
+        location: "",
+        startDate: "",
+        endDate: "",
+      }
     };
   }
+
+  toggle = () => {
+    this.setState({ modal: !this.state.modal });
+  };
+
+  handleSubmit = (item) => {
+    this.toggle();
+
+    alert("save" + JSON.stringify(item));
+  };
+
+  handleDelete = (item) => {
+    alert("delete" + JSON.stringify(item));
+  };
+
+  createItem = () => {
+    const item = { tripName: "", location: "", startDate: "", endDate: "" };
+    this.setState({ activeItem: item, modal: !this.state.modal });
+  };
+
+  editItem = (item) => {
+    this.setState({ activeItem: item, modal: !this.state.modal });
+  };
 
   isPastDate = (endDate) => {
     return new Date(endDate) < new Date(this.state.currentDate);
@@ -70,10 +99,16 @@ class App extends Component {
           </span>
         </span>
         <span>
-          <button className="btn btn-secondary mr-2">
+          <button 
+            className="btn btn-secondary mr-2"
+            onClick={() => this.editItem(item)}
+          >
             Edit
           </button>
-          <button className="btn btn-danger">
+          <button 
+            className="btn btn-danger"
+            onClick={() => this.handleDelete(item)}
+          >
             Delete
           </button>
         </span>
@@ -96,13 +131,19 @@ class App extends Component {
                   Add trip
                 </button>
               </div>
-              <div className="App">
-                <h1>Travel Planner</h1>
-                <ul className="list-group">{trips.map(this.renderItems)}</ul>
-              </div>
+              <ul className="list-group list-group-flush border-top-0">
+                  {trips.map(this.renderItems)}
+              </ul>
             </div>
           </div>
         </div>
+        {this.state.modal ? (
+          <Modal
+            activeItem={this.state.modal}
+            toggle={this.toggle}
+            onSave={this.handleSubmit}
+          />
+        ) : null}
       </main>
     );
   }
