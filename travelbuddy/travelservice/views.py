@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from .models import Trip, CustomUser
-from .serializers import TripSerializer, UserRegistrationSerializer, UserListSerializer
+from .serializers import TripSerializer, UserRegistrationSerializer, UserLoginSerializer, UserListSerializer
 import logging
 
 logger = logging.getLogger(__name__)
@@ -19,6 +19,16 @@ class UserRegistrationView(APIView):
             data = serializer.data
             data['token'] = token.key
             return Response(data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class UserLoginView(APIView):
+    def post(self, request):
+        serializer = UserLoginSerializer(data=request.data)
+        logger.info(f"UserLoginView: {request.data}")
+        if serializer.is_valid():
+            user = serializer.validated_data['user']
+            token, created = Token.objects.get_or_create(user=user)
+            return Response({'token': token.key}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class UserList(APIView):

@@ -1,46 +1,45 @@
 import React, { Component } from "react";
 import Modal from "./components/Modal";
+import Login from "./components/Login";
+import Cookies from "js-cookie";
 import './App.css';
-import axios from "axios";
 
-const tempTrips = [
-  {
-    trip_id: '00000000-0000-0000-0000-000000000000',
-    user_id: '00000000-0000-0000-0000-000000000000',
-    tripName: 'Trip 1',
-    location: 'London',
-    startDate: '2024-01-01T00:00:00',
-    endDate: '2024-01-01T00:00:00',
-    weather_forcast: {
-      temp: 0,
-      description: 'Sunny',
-      wind_speed: 0,
-    }
-  },
-  {
-    trip_id: '10000000-0000-0000-0000-000000000000',
-    user_id: '10000000-0000-0000-0000-000000000000',
-    tripName: 'Trip 2',
-    location: 'Nottingham',
-    startDate: '2024-01-01T00:00:00',
-    endDate: '2023-01-01T00:00:00',
-    weather_forcast: {
-      temp: 10,
-      description: 'Sunny',
-      wind_speed: 50,
-    }
-  },
-]
+// const tempTrips = [
+//   {
+//     trip_id: '00000000-0000-0000-0000-000000000000',
+//     user_id: '00000000-0000-0000-0000-000000000000',
+//     tripName: 'Trip 1',
+//     location: 'London',
+//     startDate: '2024-01-01T00:00:00',
+//     endDate: '2024-01-01T00:00:00',
+//     weather_forcast: {
+//       temp: 0,
+//       description: 'Sunny',
+//       wind_speed: 0,
+//     }
+//   },
+//   {
+//     trip_id: '10000000-0000-0000-0000-000000000000',
+//     user_id: '10000000-0000-0000-0000-000000000000',
+//     tripName: 'Trip 2',
+//     location: 'Nottingham',
+//     startDate: '2024-01-01T00:00:00',
+//     endDate: '2023-01-01T00:00:00',
+//     weather_forcast: {
+//       temp: 10,
+//       description: 'Sunny',
+//       wind_speed: 50,
+//     }
+//   },
+// ]
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      tripName: "",
-      startDate: "",
-      endDate: "",
-      trips: tempTrips,
+      trips: [],
       isPastDate: false,
+      isLoggedin: false,
       currentDate: new Date().toISOString().slice(0, 19),
       modal: false,
       activeItem: {
@@ -52,14 +51,37 @@ class App extends Component {
     };
   }
 
+  componentDidMount() {
+    this.refreshList();
+  }
+
+  refreshList = () => {
+    const token = Cookies.get('token');
+    console.log(token);
+    fetch("/api/trips/", {
+      headers: {
+        'Authorization': `Token ${token}`
+      }
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        this.setState({ trips: data });
+      });
+  }
+
   toggle = () => {
     this.setState({ modal: !this.state.modal });
   };
 
+  handleLoginSuccess = () => {
+    this.setState({ isLoggedIn: true });
+    this.refreshList();
+  };  
+
   handleSubmit = (item) => {
     this.toggle();
 
-    alert("save" + JSON.stringify(item));
+    
   };
 
   handleDelete = (item) => {
@@ -117,7 +139,13 @@ class App extends Component {
   };
 
   render() {
-    const { trips } = this.state;
+    const { trips, isLoggedin } = this.state;
+    console.log(trips);
+    console.log(isLoggedin);
+
+    if (!isLoggedin) {
+      return <Login onLoginSuccess={this.handleLoginSuccess} />;
+    }
 
     return (
       <main className="container">

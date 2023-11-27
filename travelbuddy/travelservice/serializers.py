@@ -1,3 +1,4 @@
+from django.contrib.auth import authenticate
 from rest_framework import serializers
 from .models import CustomUser, Trip
 from .utils import get_uuid
@@ -21,10 +22,26 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         user_id = get_uuid()
         if user_id is None:
             raise ValueError("Unable to generate UUID for user_id")
-        else:
-            validated_data['user_id'] = user_id
-            return CustomUser.objects.create(**validated_data)
         
+        user = CustomUser.objects.create(
+            username=validated_data['username'],
+            email=validated_data['email'],
+            user_id=user_id
+        )
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
+
+class UserLoginSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField()
+
+    def validate(self, data):
+        user = authenticate(username=data['username'], password=data['password'])
+        if user is None:
+            raise serializers.ValidationError("Invalid username or password.")
+        return {'user': user}
+
 class UserListSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser

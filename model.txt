@@ -1,3 +1,4 @@
+-- trips GET
 {
     "trip_proposal": {
         "user_id": "1",
@@ -11,9 +12,10 @@
         "weather_forcast": {
             // weather service returned data
         }
-    }
+    }, ...
 }
 
+-- trip POST
 {
     "trip_id": "1019d552-90d6-417a-998a-57e0fafa0220",
     "user_id": 1,
@@ -21,4 +23,22 @@
     "start_date": "2023-01-15T09:00:00Z",
     "end_date": "2023-01-20T20:00:00Z",
     "weather_forcast": ""
+}
+
+-- register POST
+{
+"username": "user2",
+"email": "user2@bleh.com",
+"password": "pass",
+"password2": "pass"
+}
+-- which returns:
+{
+    token: "token"
+}
+
+-- login POST
+{
+"username": "user2",
+"password": "pass"
 }

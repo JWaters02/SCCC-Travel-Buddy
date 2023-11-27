@@ -21,8 +21,8 @@ from travelservice import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('trips/', views.TripList.as_view(), name='trip-list'),
-    path('users/', views.UserList.as_view(), name='user-list'),
-    path('register/', views.UserRegistrationView.as_view(), name='register'),
-    path('login/', obtain_auth_token, name='login'),
+    path('api/trips/', views.TripList.as_view(), name='trip-list'),
+    path('api/users/', views.UserList.as_view(), name='user-list'),
+    path('api/register/', views.UserRegistrationView.as_view(), name='register'),
+    path('api/login/', views.UserLoginView.as_view(), name='login'),
 ]

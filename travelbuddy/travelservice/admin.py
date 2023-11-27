@@ -3,9 +3,8 @@ from .models import CustomUser, Trip
 
 # Register your models here.
 class CustomUserAdmin(admin.ModelAdmin):
-    list_display = ('username', 'email', 'user_id')
-    search_fields = ('username', 'email', 'user_id')
-    readonly_fields = ('user_id',)
+    list_display = ('username', 'email', 'password', 'user_id')
+    search_fields = ('username', 'email', 'password', 'user_id')
 
 class TripAdmin(admin.ModelAdmin):
     list_display = ('trip_id', 'user_id', 'trip_name', 'location', 'proposed_date', 'start_date', 'end_date', 'weather_forcast')
