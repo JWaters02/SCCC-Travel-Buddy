@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import Modal from "./components/Modal";
 import Login from "./components/Login";
-import Map from "./components/Map";
 import Cookies from "js-cookie";
 import './App.css';
 
@@ -148,7 +147,7 @@ class App extends Component {
         </div>
         {this.state.modal ? (
           <Modal
-            activeItem={this.state.modal}
+            activeItem={this.state.activeItem}
             toggle={this.toggle}
             onSave={this.handleSubmit}
           />

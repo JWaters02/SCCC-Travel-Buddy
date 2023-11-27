@@ -23,9 +23,36 @@ export default class CustomModal extends Component {
         };
     }
 
+    canSubmit = () => {
+        const { activeItem } = this.state;
+        const hasRequiredProps = activeItem.hasOwnProperty('name') &&
+            activeItem.hasOwnProperty('startDate') &&
+            activeItem.hasOwnProperty('endDate') &&
+            activeItem.hasOwnProperty('latitude') &&
+            activeItem.hasOwnProperty('longitude');
+
+        if (!hasRequiredProps) {
+            return false;
+        }
+
+        const nameIsValid = activeItem.name.length > 0 && activeItem.name.length <= 100;
+        const datesAreValid = activeItem.startDate && activeItem.endDate &&
+            new Date(activeItem.startDate) <= new Date(activeItem.endDate);
+        const coordsAreSet = this.state.coords_set;
+        const inputsAreNotEmpty = activeItem.name && activeItem.startDate &&
+            activeItem.endDate && activeItem.latitude &&
+            activeItem.longitude;
+
+        return nameIsValid && datesAreValid && coordsAreSet && inputsAreNotEmpty;
+    };
+
+
     handleChange = (e) => {
         let { name, value } = e.target;
-        const activeItem = { ...this.state.activeItem, [name]: value };
+        const activeItem = {
+            ...this.state.activeItem,
+            [name]: value
+        };
         this.setState({ activeItem });
     };
 
@@ -37,7 +64,7 @@ export default class CustomModal extends Component {
         };
         this.setState({ activeItem, coords_set: true });
     };
-    
+
 
     handleCoordinateChange = (e) => {
         const { name, value } = e.target;
@@ -127,6 +154,7 @@ export default class CustomModal extends Component {
                     <Button
                         color="success"
                         onClick={() => onSave(this.state.activeItem)}
+                        disabled={!this.canSubmit()}
                     >
                         Save
                     </Button>
