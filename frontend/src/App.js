@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import Modal from "./components/Modal";
 import Login from "./components/Login";
+import MapProvider from "./components/MapProvider";
 import Cookies from "js-cookie";
 import './App.css';
 
@@ -115,44 +116,46 @@ class App extends Component {
   };
 
   render() {
-    const { trips } = this.state;
+    const { trips, isLoggedIn, currentDate, modal, activeItem } = this.state;
     console.log(trips);
-    console.log(this.state.isLoggedIn);
+    console.log(isLoggedIn);
     console.log(process.env.GOOGLE_MAPS_API_KEY);
 
-    if (!this.state.isLoggedIn) {
+    if (!isLoggedIn) {
       return <Login onLoginSuccess={this.handleLoginSuccess} />;
     }
 
     return (
-      <main className="container">
-        <h1 className="text-white text text-center my-4">Trip Manager</h1>
-        <div className="row">
-          <div className="col-md-6 col-sm-10 mx-auto p-0">
-            <div className="card p-3">
-              <div className="mb-4">
-                <p>Current Date: {this.state.currentDate}</p>
-                <button 
-                  className="btn btn-primary"
-                  onClick={this.createItem}
-                >
-                  Add trip
-                </button>
+      <MapProvider>
+        <main className="container">
+          <h1 className="text-white text text-center my-4">Trip Manager</h1>
+          <div className="row">
+            <div className="col-md-6 col-sm-10 mx-auto p-0">
+              <div className="card p-3">
+                <div className="mb-4">
+                  <p>Current Date: {currentDate}</p>
+                  <button 
+                    className="btn btn-primary"
+                    onClick={this.createItem}
+                  >
+                    Add trip
+                  </button>
+                </div>
+                <ul className="list-group list-group-flush border-top-0">
+                  {trips.map(this.renderItems)}
+                </ul>
               </div>
-              <ul className="list-group list-group-flush border-top-0">
-                {trips.map(this.renderItems)}
-              </ul>
             </div>
           </div>
-        </div>
-        {this.state.modal ? (
-          <Modal
-            activeItem={this.state.activeItem}
-            toggle={this.toggle}
-            onSave={this.handleSubmit}
-          />
-        ) : null}
-      </main>
+          {modal ? (
+            <Modal
+              activeItem={activeItem}
+              toggle={this.toggle}
+              onSave={this.handleSubmit}
+            />
+          ) : null}
+        </main>
+      </MapProvider>
     );
   }
 }

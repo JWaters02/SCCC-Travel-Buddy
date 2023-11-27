@@ -65,6 +65,9 @@ export default class CustomModal extends Component {
         this.setState({ activeItem, coords_set: true });
     };
 
+    handleMapLoad = (map) => {
+        console.log("Map loaded!", map);
+    };
 
     handleCoordinateChange = (e) => {
         const { name, value } = e.target;
@@ -80,6 +83,7 @@ export default class CustomModal extends Component {
 
     render() {
         const { toggle, onSave } = this.props;
+        const { activeItem, coords_set } = this.state;
 
         return (
             <Modal isOpen={true} toggle={toggle}>
@@ -92,7 +96,7 @@ export default class CustomModal extends Component {
                                 type="text"
                                 id="trip-name"
                                 name="name"
-                                value={this.state.activeItem.name}
+                                value={activeItem.name}
                                 onChange={this.handleChange}
                                 placeholder="Enter trip name"
                             />
@@ -103,7 +107,7 @@ export default class CustomModal extends Component {
                                 type="date"
                                 id="trip-startDate"
                                 name="startDate"
-                                value={this.state.activeItem.startDate}
+                                value={activeItem.startDate}
                                 onChange={this.handleChange}
                                 placeholder="Enter trip start date"
                             />
@@ -114,15 +118,16 @@ export default class CustomModal extends Component {
                                 type="date"
                                 id="trip-endDate"
                                 name="endDate"
-                                value={this.state.activeItem.endDate}
+                                value={activeItem.endDate}
                                 onChange={this.handleChange}
                                 placeholder="Enter trip end date"
                             />
                         </FormGroup>
                         <Map
                             onMarkerPlaced={this.handleMarkerPositionChange}
-                            latitude={parseFloat(this.state.activeItem.latitude)}
-                            longitude={parseFloat(this.state.activeItem.longitude)}
+                            latitude={parseFloat(activeItem.latitude)}
+                            longitude={parseFloat(activeItem.longitude)}
+                            onMapLoad={this.handleMapLoad}
                         />
                         <FormGroup>
                             <Label for="trip-latitude">Latitude</Label>
@@ -130,8 +135,8 @@ export default class CustomModal extends Component {
                                 type="number"
                                 id="trip-latitude"
                                 name="latitude"
-                                disabled={!this.state.coords_set}
-                                value={this.state.activeItem.latitude}
+                                disabled={!coords_set}
+                                value={activeItem.latitude}
                                 onChange={this.handleChange}
                                 placeholder="Place a marker on the map">
                             </Input>
@@ -142,8 +147,8 @@ export default class CustomModal extends Component {
                                 type="number"
                                 id="trip-longitude"
                                 name="longitude"
-                                disabled={!this.state.coords_set}
-                                value={this.state.activeItem.longitude}
+                                disabled={!coords_set}
+                                value={activeItem.longitude}
                                 onChange={this.handleChange}
                                 placeholder="Place a marker on the map">
                             </Input>
@@ -153,7 +158,7 @@ export default class CustomModal extends Component {
                 <ModalFooter>
                     <Button
                         color="success"
-                        onClick={() => onSave(this.state.activeItem)}
+                        onClick={() => onSave(activeItem)}
                         disabled={!this.canSubmit()}
                     >
                         Save

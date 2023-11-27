@@ -40,3 +40,5 @@
 .bg-light-red {
   background-color: #ffcccc;
 }
+
+body > iframe { display: none }
