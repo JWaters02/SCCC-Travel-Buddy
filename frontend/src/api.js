@@ -14,9 +14,13 @@ const axiosWithAuth = () => {
 // Get from /api/uuid/
 export const getUUID = async () => {
     try {
-        const response = await axiosWithAuth().get("/api/uuid/");
+        const response = await axios.get("/api/uuid/");
         return response.data;
     } catch (error) {
+        if (error.response && error.response.status === 429) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            return getUUID();
+        }
         console.error(error);
     }
 };
@@ -115,6 +119,10 @@ export const register = async (registerData) => {
         Cookies.set('token', token);
         return { id: user_id, email, username };
     } catch (error) {
+        if (error.response && error.response.status === 400) {
+            const errorMessages = Object.entries(error.response.data).map(([key, value]) => `${key}: ${value}`);
+            return { status: 'error', errorMessages };
+        }
         console.error("Registration error", error);
         throw error;
     }

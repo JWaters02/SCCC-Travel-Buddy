@@ -6,6 +6,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from .models import Trip, CustomUser
 from .serializers import TripSerializer, UserRegistrationSerializer, UserLoginSerializer, UserListSerializer
+from .utils import get_uuid
+from .throttles import UUIDRateThrottle
 import logging
 
 logger = logging.getLogger(__name__)
@@ -15,7 +17,7 @@ class UserRegistrationView(APIView):
         serializer = UserRegistrationSerializer(data=request.data)
         logger.info(f"UserRegistrationView: {request.data}")
         if serializer.is_valid():
-            user = serializer.save()
+            user = serializer.save(user_id=request.data.get('user_id'))
             token, created = Token.objects.get_or_create(user=user)
             data = serializer.data
             data['token'] = token.key
@@ -75,6 +77,12 @@ class UserList(APIView):
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+class UUIDView(APIView):
+    throttle_classes = [UUIDRateThrottle]
+
+    def get(self, request, format=None):
+        return Response({'uuid': get_uuid()}, status=status.HTTP_200_OK)
+
 class TripList(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -86,6 +94,6 @@ class TripList(APIView):
     def post(self, request, format=None):
         serializer = TripSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(trip_id=request.data.get('trip_id'))
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

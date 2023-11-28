@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import Modal from "./components/Modal";
-import Login from "./components/Login";
+import Landing from "./components/Landing";
 import MapProvider from "./components/MapProvider";
 import { addTrip, reauthenticate, getTrips } from "./api";
 import Cookies from "js-cookie";
@@ -18,6 +18,7 @@ class App extends Component {
       trips: [],
       isPastDate: false,
       isLoggedIn: false,
+      isLogin: true,
       currentDate: new Date().toISOString().slice(0, 19),
       modal: false,
       activeItem: {
@@ -50,7 +51,7 @@ class App extends Component {
       this.refreshTripsList();
     }
   }
-  
+
   refreshTripsList = () => {
     getTrips()
       .then((data) => {
@@ -64,7 +65,6 @@ class App extends Component {
   };
 
   handleLoginSuccess = (details) => {
-    console.log(details);
     this.setState({
       isLoggedIn: true,
       userDetails: details
@@ -99,6 +99,10 @@ class App extends Component {
   isPastDate = (endDate) => {
     return new Date(endDate) < new Date(this.state.currentDate);
   }
+
+  toggleLogin = () => {
+    this.setState({ isLogin: !this.state.isLogin });
+  };
 
   renderItems = (item) => {
     return (
@@ -140,7 +144,12 @@ class App extends Component {
     const { trips, isLoggedIn, currentDate, modal, activeItem } = this.state;
 
     if (!isLoggedIn) {
-      return <Login onLoginSuccess={this.handleLoginSuccess} />;
+      return (
+        <Landing
+          onLoginSuccess={this.handleLoginSuccess}
+          onRegisterSuccess={this.handleLoginSuccess}
+        />
+      );
     }
 
     return (

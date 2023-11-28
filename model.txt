@@ -18,6 +18,7 @@
 -- trip POST
 {
     "user_id": "ead8dce4-bc15-4959-bc08-007738ab6de0",
+    "trip_id": "trip_id",
     "trip_name": "run",
     "latitude": "51.5074",
     "longitude": "0.1278",
@@ -27,16 +28,17 @@
 
 -- register POST
 {
-"username": "user2",
-"email": "user2@bleh.com",
-"password": "pass",
-"password2": "pass"
+    "user_id": "ead8dce4-bc15-4959-bc08-007738ab6de0",
+    "username": "user2",
+    "email": "user2@bleh.com",
+    "password": "pass",
+    "password2": "pass"
 }
 -- which returns:
 {
     "username": "user2",
     "email": "user2@bleh.com",
-    "user_id": "user_id",
+    "user_id": "ead8dce4-bc15-4959-bc08-007738ab6de0",
     "token": "token"
 }
 {
@@ -47,14 +49,14 @@
 
 -- login POST
 {
-"username": "user2",
-"password": "pass"
+    "username": "user2",
+    "password": "pass"
 }
 -- which returns:
 {
     "username": "user2",
     "email": "user2@bleh.com",
-    "user_id": "user_id",
+    "user_id": "ead8dce4-bc15-4959-bc08-007738ab6de0",
     "token": "token"
 }
 {
