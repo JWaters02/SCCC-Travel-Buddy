@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import axios from 'axios';
-import Cookies from 'js-cookie';
+import { login } from '../api';
 
 class Login extends Component {
     state = {
@@ -14,18 +13,14 @@ class Login extends Component {
 
     handleSubmit = (event) => {
         event.preventDefault();
-        axios.post('/api/login/', this.state)
-            .then(response => {
-                const { token, user_id, email, username } = response.data;
-                Cookies.set('token', token);
-                console.log(response.data)
-                this.props.onLoginSuccess({ id: user_id, email: email, username: username });
+        login(this.state)
+            .then(userDetails => {
+                this.props.onLoginSuccess(userDetails);
             })
             .catch(error => {
                 console.error("Login error", error);
             });
     };
-    
 
     render() {
         return (

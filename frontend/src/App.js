@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import Modal from "./components/Modal";
 import Login from "./components/Login";
 import MapProvider from "./components/MapProvider";
-import { addTrip } from "./api";
+import { addTrip, reauthenticate, getTrips } from "./api";
 import Cookies from "js-cookie";
 import './App.css';
 
@@ -34,12 +34,7 @@ class App extends Component {
     const token = Cookies.get('token');
     if (token) {
       if (this.state.userDetails.id === "") {
-        fetch("/api/reauth/", {
-          headers: {
-            'Authorization': `Token ${token}`
-          }
-        })
-          .then((response) => response.json())
+        reauthenticate()
           .then((data) => {
             this.setState({
               userDetails: {
@@ -55,20 +50,14 @@ class App extends Component {
       this.refreshTripsList();
     }
   }
-
+  
   refreshTripsList = () => {
-    const token = Cookies.get('token');
-    fetch("/api/trips/", {
-      headers: {
-        'Authorization': `Token ${token}`
-      }
-    })
-      .then((response) => response.json())
+    getTrips()
       .then((data) => {
         this.setState({ trips: data });
       })
       .catch((error) => console.log(error));
-  }
+  };
 
   toggle = () => {
     this.setState({ modal: !this.state.modal });
