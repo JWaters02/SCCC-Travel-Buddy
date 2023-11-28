@@ -5,6 +5,14 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+window.addEventListener('unhandledrejection', function (event) {
+  if (event.reason.message.toLowerCase().includes('tba') || event.reason.message.toLowerCase().includes('is undefined')) {
+    console.warn('Unhandled Google Maps API error:', event.reason);
+    event.preventDefault();
+    document.querySelector('iframe').style.display = 'none';
+  }
+});
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>

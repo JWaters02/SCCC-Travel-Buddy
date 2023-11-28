@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate
+from django.core.validators import EmailValidator
 from rest_framework import serializers
 import logging
 from .models import CustomUser, Trip
@@ -17,6 +18,13 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
+        if not validated_data['username']:
+            raise serializers.ValidationError({'username': 'Username cannot be empty.'})
+        if not validated_data['email']:
+            raise serializers.ValidationError({'email': 'Email cannot be empty.'})
+        if not validated_data['password']:
+            raise serializers.ValidationError({'password': 'Password cannot be empty.'})
+
         password = validated_data['password']
         password2 = validated_data.pop('password2')
         if password != password2:
@@ -71,7 +79,7 @@ class TripSerializer(serializers.ModelSerializer):
         weather = get_weather(validated_data['latitude'], validated_data['longitude'], validated_data['start_date'], validated_data['end_date'])
         if weather is None:
             logger.error(f"Unable to retrieve weather data for {validated_data['latitude']}, {validated_data['longitude']}")
-            return "Unable to retrieve weather data"
+            raise ValueError("Unable to retrieve weather data")
         
         validated_data['trip_id'] = trip_id
         validated_data['location'] = location

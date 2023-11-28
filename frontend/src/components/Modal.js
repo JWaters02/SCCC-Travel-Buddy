@@ -25,7 +25,7 @@ export default class CustomModal extends Component {
 
     canSubmit = () => {
         const { activeItem } = this.state;
-        const hasRequiredProps = activeItem.hasOwnProperty('name') &&
+        const hasRequiredProps = activeItem.hasOwnProperty('tripName') &&
             activeItem.hasOwnProperty('startDate') &&
             activeItem.hasOwnProperty('endDate') &&
             activeItem.hasOwnProperty('latitude') &&
@@ -35,15 +35,12 @@ export default class CustomModal extends Component {
             return false;
         }
 
-        const nameIsValid = activeItem.name.length > 0 && activeItem.name.length <= 100;
-        const datesAreValid = activeItem.startDate && activeItem.endDate &&
-            new Date(activeItem.startDate) <= new Date(activeItem.endDate);
+        const tripNameIsValid = activeItem.tripName.length > 0 && activeItem.tripName.length <= 100;
+        const datesAreValid = activeItem.startDate && activeItem.endDate && new Date(activeItem.startDate) <= new Date(activeItem.endDate);
         const coordsAreSet = this.state.coords_set;
-        const inputsAreNotEmpty = activeItem.name && activeItem.startDate &&
-            activeItem.endDate && activeItem.latitude &&
-            activeItem.longitude;
+        const inputsAreNotEmpty = activeItem.tripName && activeItem.startDate && activeItem.endDate && activeItem.latitude && activeItem.longitude;
 
-        return nameIsValid && datesAreValid && coordsAreSet && inputsAreNotEmpty;
+        return tripNameIsValid && datesAreValid && coordsAreSet && inputsAreNotEmpty;
     };
 
 
@@ -95,7 +92,7 @@ export default class CustomModal extends Component {
                             <Input
                                 type="text"
                                 id="trip-name"
-                                name="name"
+                                name="tripName"
                                 value={activeItem.name}
                                 onChange={this.handleChange}
                                 placeholder="Enter trip name"

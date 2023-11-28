@@ -2,28 +2,26 @@ import React, { Component } from "react";
 import Modal from "./components/Modal";
 import Login from "./components/Login";
 import MapProvider from "./components/MapProvider";
+import { addTrip } from "./api";
 import Cookies from "js-cookie";
 import './App.css';
-
-window.addEventListener('unhandledrejection', function (event) {
-  if (event.reason.message.toLowerCase().includes('tba') || event.reason.message.toLowerCase().includes('is undefined')) {
-    console.warn('Unhandled Google Maps API error:', event.reason);
-    event.preventDefault();
-    document.querySelector('iframe').style.display = 'none';
-  }
-});
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      userDetails: {
+        id: "",
+        email: "",
+        username: "",
+      },
       trips: [],
       isPastDate: false,
       isLoggedIn: false,
       currentDate: new Date().toISOString().slice(0, 19),
       modal: false,
       activeItem: {
-        name: "",
+        tripName: "",
         longitude: 0.0,
         latitude: 0.0,
         startDate: "",
@@ -33,13 +31,32 @@ class App extends Component {
   }
 
   componentDidMount() {
-    if (Cookies.get('token')) {
+    const token = Cookies.get('token');
+    if (token) {
+      if (this.state.userDetails.id === "") {
+        fetch("/api/reauth/", {
+          headers: {
+            'Authorization': `Token ${token}`
+          }
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            this.setState({
+              userDetails: {
+                id: data.user_id,
+                email: data.email,
+                username: data.username,
+              }
+            });
+          })
+          .catch((error) => console.log(error));
+      }
       this.setState({ isLoggedIn: true });
+      this.refreshTripsList();
     }
-    this.refreshList();
   }
 
-  refreshList = () => {
+  refreshTripsList = () => {
     const token = Cookies.get('token');
     fetch("/api/trips/", {
       headers: {
@@ -57,16 +74,24 @@ class App extends Component {
     this.setState({ modal: !this.state.modal });
   };
 
-  handleLoginSuccess = () => {
-    console.log("Login successful");
-    this.setState({ isLoggedIn: true });
-    this.refreshList();
+  handleLoginSuccess = (details) => {
+    console.log(details);
+    this.setState({
+      isLoggedIn: true,
+      userDetails: details
+    }, () => {
+      this.refreshTripsList();
+    });
   };
 
-  handleSubmit = (item) => {
+  handleAddTrip = (item) => {
     this.toggle();
 
-
+    addTrip(item, this.state.userDetails)
+      .then((data) => {
+        this.refreshTripsList();
+      })
+      .catch((error) => console.log(error));
   };
 
   handleDelete = (item) => {
@@ -138,7 +163,7 @@ class App extends Component {
               <div className="card p-3">
                 <div className="mb-4">
                   <p>Current Date: {currentDate}</p>
-                  <button 
+                  <button
                     className="btn btn-primary"
                     onClick={this.createItem}
                   >
@@ -155,7 +180,7 @@ class App extends Component {
             <Modal
               activeItem={activeItem}
               toggle={this.toggle}
-              onSave={this.handleSubmit}
+              onSave={this.handleAddTrip}
             />
           ) : null}
         </main>

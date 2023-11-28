@@ -16,13 +16,16 @@ class Login extends Component {
         event.preventDefault();
         axios.post('/api/login/', this.state)
             .then(response => {
-                Cookies.set('token', response.data.token);
-                this.props.onLoginSuccess();
+                const { token, user_id, email, username } = response.data;
+                Cookies.set('token', token);
+                console.log(response.data)
+                this.props.onLoginSuccess({ id: user_id, email: email, username: username });
             })
             .catch(error => {
                 console.error("Login error", error);
             });
     };
+    
 
     render() {
         return (

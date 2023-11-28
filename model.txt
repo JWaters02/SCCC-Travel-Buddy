@@ -34,11 +34,31 @@
 }
 -- which returns:
 {
-    token: "token"
+    "username": "user2",
+    "email": "user2@bleh.com",
+    "user_id": "user_id",
+    "token": "token"
+}
+{
+    "username": [
+        "A user with that username already exists."
+    ]
 }
 
 -- login POST
 {
 "username": "user2",
 "password": "pass"
+}
+-- which returns:
+{
+    "username": "user2",
+    "email": "user2@bleh.com",
+    "user_id": "user_id",
+    "token": "token"
+}
+{
+    "non_field_errors": [
+        "Invalid username or password."
+    ]
 }

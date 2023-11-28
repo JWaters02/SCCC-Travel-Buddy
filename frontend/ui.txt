@@ -1,0 +1,14 @@
+login:
+    - username
+    - password
+    - submit
+    - forgot password
+    - register
+
+register:
+    - username
+    - password
+    - confirm password
+    - email
+    - submit
+

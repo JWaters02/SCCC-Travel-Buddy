@@ -29,8 +29,14 @@ class UserLoginView(APIView):
         if serializer.is_valid():
             user = serializer.validated_data['user']
             token, created = Token.objects.get_or_create(user=user)
-            return Response({'token': token.key}, status=status.HTTP_200_OK)
+            return Response({'username': user.username, 'email': user.email, 'user_id': user.user_id, 'token': token.key}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class UserReauthView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+        return Response({'username': request.user.username, 'email': request.user.email, 'user_id': request.user.user_id}, status=status.HTTP_200_OK)
 
 class UserList(APIView):
     permission_classes = [IsAuthenticated]
@@ -70,7 +76,7 @@ class UserList(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 class TripList(APIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
         trips = Trip.objects.all()
