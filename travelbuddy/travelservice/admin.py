@@ -7,8 +7,8 @@ class CustomUserAdmin(admin.ModelAdmin):
     search_fields = ('username', 'email', 'password', 'user_id')
 
 class TripAdmin(admin.ModelAdmin):
-    list_display = ('trip_id', 'user_id', 'trip_name', 'location', 'latitude', 'longitude', 'proposed_date', 'start_date', 'end_date', 'weather_forcast')
-    search_fields = ('trip_id', 'user_id', 'trip_name', 'location', 'latitude', 'longitude', 'proposed_date', 'start_date', 'end_date', 'weather_forcast')
+    list_display = ('trip_id', 'user_id', 'trip_name', 'location', 'latitude', 'longitude', 'proposed_date', 'start_date', 'end_date', 'weather_forcast', 'interests')
+    search_fields = ('trip_id', 'user_id', 'trip_name', 'location', 'latitude', 'longitude', 'proposed_date', 'start_date', 'end_date', 'weather_forcast', 'interests')
     readonly_fields = ('trip_id', 'location', 'proposed_date')
 
 admin.site.register(CustomUser, CustomUserAdmin)
