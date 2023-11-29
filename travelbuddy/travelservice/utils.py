@@ -51,18 +51,20 @@ def get_location(lat, lon):
 
     try:
         response = requests.get(url, params=payload)
-        response.raise_for_status()
+        if response.status_code != 200:
+            return response.status_code, response.json()
+
         data = response.json()
         if len(data) > 0:
-            return f"{data[0]['name']}, {data[0]['state']}, {data[0]['country']}"
+            return 200, f"{data[0]['name']}, {data[0]['state']}, {data[0]['country']}"
         else:
-            return None
+            return 200, "Unknown location"
     except requests.RequestException as e:
         logger.error(f"Network-related error when contacting openweathermap.org: {e}")
-        return None
+        return 500, {'error': str(e)}
     except Exception as e:
         logger.error(f"Error in processing or fetching the location data: {e}")
-        return None
+        return 500, {'error': str(e)}
 
 def get_weather(lat, lon, start_date, end_date):
     # 1. convert the dates to unix timestamp

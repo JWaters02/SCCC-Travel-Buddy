@@ -6,11 +6,31 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from .models import Trip, CustomUser
 from .serializers import TripSerializer, UserRegistrationSerializer, UserLoginSerializer, UserListSerializer
-from .utils import get_uuid
+from .utils import get_uuid, get_location
 from .throttles import UUIDRateThrottle
 import logging
 
 logger = logging.getLogger(__name__)
+
+class UUIDView(APIView):
+    #throttle_classes = [UUIDRateThrottle]
+
+    def get(self, request, format=None):
+        return Response({'uuid': get_uuid()}, status=status.HTTP_200_OK)
+    
+class LocationView(APIView):
+    def get(self, request, format=None):
+        latitude = request.query_params.get('lat', None)
+        longitude = request.query_params.get('lon', None)
+        if latitude is None or longitude is None:
+            return Response({'error': 'Latitude and longitude are required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        status_code, location_data = get_location(latitude, longitude)
+        if status_code != 200:
+            return Response({'error': location_data}, status=status_code)
+        if location_data is None:
+            return Response({'error': 'Unable to retrieve location data.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({'location': location_data}, status=status_code)
 
 class UserRegistrationView(APIView):
     def post(self, request):
@@ -76,12 +96,6 @@ class UserList(APIView):
         user = CustomUser.objects.get(user_id=request.data['user_id'])
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-class UUIDView(APIView):
-    throttle_classes = [UUIDRateThrottle]
-
-    def get(self, request, format=None):
-        return Response({'uuid': get_uuid()}, status=status.HTTP_200_OK)
 
 class TripList(APIView):
     permission_classes = [IsAuthenticated]

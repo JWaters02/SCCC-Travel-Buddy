@@ -25,22 +25,29 @@ export const getUUID = async () => {
     }
 };
 
-// Get from /api/location/?latitude=${latitude}&longitude=${longitude}
+// Get from /api/location/?lat=${latitude}&lon=${longitude}
 export const getLocation = async (latitude, longitude) => {
     try {
-        const response = await axiosWithAuth.get(`/api/location/?latitude=${latitude}&longitude=${longitude}`);
-        return response.data;
+        const response = await axios.get(`/api/location/?lat=${latitude}&lon=${longitude}`);
+        return response.data.location;
     } catch (error) {
-        console.error(error);
+        console.error("Location retrieval error", error);
+        if (error.response && error.response.status !== 200) {
+            const errorMessages = Object.entries(error.response.data).map(([key, value]) => `${key}: ${value}`);
+            return { status: 'error', errorMessages };
+        }
+        throw error;
     }
 };
 
 // Post to /api/trips/
 export const addTrip = async (item, userDetails) => {
-    const { tripName, latitude, longitude, startDate, endDate } = item;
+    const { tripId, tripName, location, latitude, longitude, startDate, endDate } = item;
     const body = {
+        trip_id: tripId,
         user_id: userDetails.id,
         trip_name: tripName,
+        location,
         latitude,
         longitude,
         start_date: startDate,

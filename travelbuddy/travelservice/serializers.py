@@ -61,17 +61,11 @@ class TripSerializer(serializers.ModelSerializer):
         model = Trip
         fields = ['trip_id', 'user_id', 'trip_name', 'location', 'latitude', 'longitude', 'proposed_date', 'start_date', 'end_date', 'weather_forcast', 'interests']
 
-    def create(self, validated_data):        
-        location = get_location(validated_data['latitude'], validated_data['longitude'])
-        if location is None:
-            logger.error(f"Unable to retrieve location data for {validated_data['latitude']}, {validated_data['longitude']}")
-            location = f"{validated_data['latitude']}, {validated_data['longitude']}"
-        
+    def create(self, validated_data):
         weather = get_weather(validated_data['latitude'], validated_data['longitude'], validated_data['start_date'], validated_data['end_date'])
         if weather is None:
             logger.error(f"Unable to retrieve weather data for {validated_data['latitude']}, {validated_data['longitude']}")
             raise ValueError("Unable to retrieve weather data")
         
-        validated_data['location'] = location
         validated_data['weather_forcast'] = weather
         return Trip.objects.create(**validated_data)

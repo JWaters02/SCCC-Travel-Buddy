@@ -21,8 +21,11 @@ class App extends Component {
       isLogin: true,
       currentDate: new Date().toISOString().slice(0, 19),
       modal: false,
+      isModalCreate: true,
       activeItem: {
+        tripId: "",
         tripName: "",
+        location: "",
         longitude: 0.0,
         latitude: 0.0,
         startDate: "",
@@ -89,11 +92,12 @@ class App extends Component {
 
   createItem = () => {
     const item = { tripName: "", location: "", startDate: "", endDate: "" };
-    this.setState({ activeItem: item, modal: !this.state.modal });
+    this.setState({ activeItem: item, modal: !this.state.modal, isModalCreate: true });
   };
 
   editItem = (item) => {
-    this.setState({ activeItem: item, modal: !this.state.modal });
+    this.setState({ activeItem: item, modal: !this.state.modal, isModalCreate: false });
+    console.log("editItem in App.js", item);
   };
 
   isPastDate = (endDate) => {
@@ -176,6 +180,9 @@ class App extends Component {
           </div>
           {modal ? (
             <Modal
+              key={this.state.isModalCreate ? 'create-modal' : 'edit-modal'}
+              existingTripId={activeItem.tripId}
+              isModalCreate={this.state.isModalCreate}
               activeItem={activeItem}
               toggle={this.toggle}
               onSave={this.handleAddTrip}

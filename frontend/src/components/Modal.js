@@ -11,16 +11,60 @@ import {
     Label,
 } from "reactstrap";
 import Map from "./Map";
+import { getLocation, getUUID } from "../api";
 
 export default class CustomModal extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            isModalCreate: this.props.isModalCreate,
+            existingTripId: this.props.existingTripId,
             activeItem: this.props.activeItem,
             markerLatitude: null,
             markerLongitude: null,
             coords_set: false,
+            tripIdSet: false,
         };
+    }
+
+    componentDidMount() {
+        if (this.props.isModalCreate) {
+            getUUID()
+                .then((uuid) => {
+                    this.setState({
+                        activeItem: {
+                            ...this.state.activeItem,
+                            tripId: uuid["uuid"],
+                        },
+                        tripIdSet: true,
+                    });
+                })
+                .catch((error) => {
+                    this.setState({
+                        activeItem: {
+                            ...this.state.activeItem,
+                            tripId: 'error - please refresh the page',
+                        },
+                    });
+                    console.error("UUID error", error);
+                });
+        } else {
+            this.setState({
+                activeItem: {
+                    ...this.state.activeItem,
+                    tripId: this.props.existingTripId,
+                },
+                coords_set: true,
+            }, () => console.log("componentDidMount", this.state.activeItem));
+        }
+    }
+
+    componentDidUpdate(prevProps) {
+        console.log("componentDidUpdate");
+        if (this.props.activeItem !== prevProps.activeItem) {
+            console.log("componentDidUpdate - tripId changed");
+            this.setState({ activeItem: this.props.activeItem });
+        }
     }
 
     canSubmit = () => {
@@ -43,7 +87,6 @@ export default class CustomModal extends Component {
         return tripNameIsValid && datesAreValid && coordsAreSet && inputsAreNotEmpty;
     };
 
-
     handleChange = (e) => {
         let { name, value } = e.target;
         const activeItem = {
@@ -54,16 +97,23 @@ export default class CustomModal extends Component {
     };
 
     handleMarkerPositionChange = (lat, lon) => {
-        const activeItem = {
-            ...this.state.activeItem,
-            latitude: parseFloat(lat.toFixed(2)),
-            longitude: parseFloat(lon.toFixed(2)),
-        };
-        this.setState({ activeItem, coords_set: true });
+        getLocation(lat, lon)
+            .then(location => {
+                const activeItem = {
+                    ...this.state.activeItem,
+                    location,
+                    latitude: parseFloat(lat.toFixed(2)),
+                    longitude: parseFloat(lon.toFixed(2)),
+                };
+                this.setState({ activeItem, coords_set: true });
+            })
+            .catch(error => {
+                console.error("Location error", error);
+            });
     };
 
     handleMapLoad = (map) => {
-        console.log("Map loaded!", map);
+        //console.log("Map loaded!", map);
     };
 
     handleCoordinateChange = (e) => {
@@ -72,7 +122,6 @@ export default class CustomModal extends Component {
 
         this.setState({ activeItem });
 
-        // Call the onMarkerPlaced prop only if both latitude and longitude are numbers
         if (!isNaN(activeItem.latitude) && !isNaN(activeItem.longitude)) {
             this.props.onMarkerPlaced(activeItem.latitude, activeItem.longitude);
         }
@@ -81,12 +130,25 @@ export default class CustomModal extends Component {
     render() {
         const { toggle, onSave } = this.props;
         const { activeItem, coords_set } = this.state;
+        console.log("render", activeItem);
 
         return (
             <Modal isOpen={true} toggle={toggle}>
                 <ModalHeader toggle={toggle}>Trips</ModalHeader>
                 <ModalBody>
                     <Form>
+                        <FormGroup>
+                            <Label for="trip-id">Trip ID</Label>
+                            <Input
+                                type="text"
+                                id="trip-id"
+                                name="tripId"
+                                value={activeItem.tripId}
+                                onChange={this.handleChange}
+                                disabled={true}
+                                placeholder="Trip ID"
+                            />
+                        </FormGroup>
                         <FormGroup>
                             <Label for="trip-name">Trip Name</Label>
                             <Input
@@ -96,6 +158,18 @@ export default class CustomModal extends Component {
                                 value={activeItem.name}
                                 onChange={this.handleChange}
                                 placeholder="Enter trip name"
+                            />
+                        </FormGroup>
+                        <FormGroup>
+                            <Label for="trip-location">Location</Label>
+                            <Input
+                                type="text"
+                                id="trip-location"
+                                name="location"
+                                value={activeItem.location}
+                                onChange={this.handleChange}
+                                disabled={true}
+                                placeholder="Place a marker on the map to get the location!"
                             />
                         </FormGroup>
                         <FormGroup>
