@@ -20,13 +20,13 @@ const App = () => {
   const [modal, setModal] = useState(false);
   const [isModalCreate, setIsModalCreate] = useState(true);
   const [activeItem, setActiveItem] = useState({
-    tripId: "",
-    tripName: "",
+    trip_id: "",
+    trip_name: "",
     location: "",
     longitude: 0.0,
     latitude: 0.0,
-    startDate: "",
-    endDate: "",
+    start_date: "",
+    end_date: "",
   });
 
   useEffect(() => {
@@ -102,9 +102,10 @@ const App = () => {
   };
 
   const createTrip = () => {
-    const item = { tripName: "", location: "", startDate: "", endDate: "" };
-    setActiveItem(item);
+    const item = { trip_name: "", location: "", start_date: "", end_date: "" };
     setModal(true);
+    setActiveItem(item);
+    console.log("createTrip", item)
     setIsModalCreate(true);
   };
 
@@ -114,8 +115,8 @@ const App = () => {
     setIsModalCreate(false);
   };
 
-  const isPastDate = (endDate) => {
-    return new Date(endDate) < new Date(currentDate);
+  const isPastDate = (end_date) => {
+    return new Date(end_date) < new Date(currentDate);
   };
 
   const renderTripItems = (item) => {
@@ -193,13 +194,14 @@ const App = () => {
                   </Card>
                 </Col>
               </Row>
-              {modal && (
+              {modal && activeItem !== undefined && (
                 <Modal
                   key={isModalCreate ? 'create-modal' : 'edit-modal'}
                   isOpen={modal}
                   toggle={toggleModal}
                   isModalCreate={isModalCreate}
-                  activeItemProp={activeItem}
+                  activeItem={activeItem}
+                  setActiveItem={setActiveItem}
                   onSave={isModalCreate ? handleAddTrip : handleEditTrip}
                 />
               )}

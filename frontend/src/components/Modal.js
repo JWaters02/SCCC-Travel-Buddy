@@ -13,43 +13,39 @@ import {
 import Map from "./Map";
 import { getLocation, getUUID } from "../api";
 
-const CustomModal = ({ isModalCreate, activeItemProp, toggle, onSave }) => {
-    const [activeItem, setActiveItem] = useState(activeItemProp);
+const CustomModal = ({ isModalCreate, activeItem, setActiveItem, toggle, onSave }) => {
     const [coordsSet, setCoordsSet] = useState(false);
 
-    console.log(activeItemProp)
+    console.log(activeItem)
     console.log(isModalCreate)
 
     useEffect(() => {
         if (isModalCreate) {
             getUUID()
                 .then((uuid) => {
+                    console.log(uuid)
                     setActiveItem(prevActiveItem => ({
                         ...prevActiveItem,
-                        tripId: uuid["uuid"],
+                        trip_id: uuid["uuid"],
                     }));
+                    console.log("activeItem");
                 })
                 .catch((error) => {
                     setActiveItem(prevActiveItem => ({
                         ...prevActiveItem,
-                        tripId: 'error - please refresh the page',
+                        trip_id: 'error - please refresh the page',
                     }));
                     console.error("UUID error", error);
                 });
         } else {
-            setActiveItem(activeItemProp);
             setCoordsSet(true);
         }
-    }, [isModalCreate, activeItemProp]);
-
-    useEffect(() => {
-        setActiveItem(activeItemProp);
-    }, [activeItemProp]);
+    }, [isModalCreate, setActiveItem]);
 
     const canSubmit = () => {
-        const hasRequiredProps = 'tripName' in activeItem &&
-            'startDate' in activeItem &&
-            'endDate' in activeItem &&
+        const hasRequiredProps = 'trip_name' in activeItem &&
+            'start_date' in activeItem &&
+            'end_date' in activeItem &&
             'latitude' in activeItem &&
             'longitude' in activeItem;
     
@@ -57,9 +53,9 @@ const CustomModal = ({ isModalCreate, activeItemProp, toggle, onSave }) => {
             return false;
         }
         
-        const tripNameIsValid = activeItem.tripName.length > 0 && activeItem.tripName.length <= 100;
-        const datesAreValid = activeItem.startDate && activeItem.endDate && new Date(activeItem.startDate) <= new Date(activeItem.endDate);
-        const inputsAreNotEmpty = activeItem.tripName && activeItem.startDate && activeItem.endDate && activeItem.latitude && activeItem.longitude;
+        const tripNameIsValid = activeItem.trip_name.length > 0 && activeItem.trip_name.length <= 100;
+        const datesAreValid = activeItem.start_date && activeItem.end_date && new Date(activeItem.start_date) <= new Date(activeItem.end_date);
+        const inputsAreNotEmpty = activeItem.trip_name && activeItem.start_date && activeItem.end_date && activeItem.latitude && activeItem.longitude;
     
         return tripNameIsValid && datesAreValid && coordsSet && inputsAreNotEmpty;
     };
@@ -122,8 +118,8 @@ const CustomModal = ({ isModalCreate, activeItemProp, toggle, onSave }) => {
                         <Input
                             type="text"
                             id="trip-id"
-                            name="tripId"
-                            value={activeItem.tripId}
+                            name="trip_id"
+                            value={activeItem.trip_id}
                             onChange={handleChange}
                             disabled={true}
                             placeholder="Trip ID"
@@ -134,8 +130,8 @@ const CustomModal = ({ isModalCreate, activeItemProp, toggle, onSave }) => {
                         <Input
                             type="text"
                             id="trip-name"
-                            name="tripName"
-                            value={activeItem.name}
+                            name="trip_name"
+                            value={activeItem.trip_name}
                             onChange={handleChange}
                             placeholder="Enter trip name"
                         />
@@ -153,23 +149,23 @@ const CustomModal = ({ isModalCreate, activeItemProp, toggle, onSave }) => {
                         />
                     </FormGroup>
                     <FormGroup>
-                        <Label for="trip-startDate">Start Date</Label>
+                        <Label for="trip-start_date">Start Date</Label>
                         <Input
                             type="datetime-local"
-                            id="trip-startDate"
-                            name="startDate"
-                            value={activeItem.startDate}
+                            id="trip-start_date"
+                            name="start_date"
+                            value={activeItem.start_date}
                             onChange={handleChange}
                             placeholder="Enter trip start date"
                         />
                     </FormGroup>
                     <FormGroup>
-                        <Label for="trip-endDate">End Date</Label>
+                        <Label for="trip-end_date">End Date</Label>
                         <Input
                             type="datetime-local"
-                            id="trip-endDate"
-                            name="endDate"
-                            value={activeItem.endDate}
+                            id="trip-end_date"
+                            name="end_date"
+                            value={activeItem.end_date}
                             onChange={handleChange}
                             placeholder="Enter trip end date"
                         />
