@@ -30,7 +30,7 @@ const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentDate] = useState(new Date().toISOString().slice(0, 19));
   const [modal, setModal] = useState(false);
-  const [isModalCreate, setIsModalCreate] = useState(true);
+  const [modalMode, setModalMode] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [tripFilter, setTripFilter] = useState('All trips');
   const [showEndedTrips, setShowEndedTrips] = useState(false);
@@ -132,20 +132,19 @@ const App = () => {
     const item = { trip_name: "", location: "", start_date: "", end_date: "" };
     setModal(true);
     setActiveItem(item);
-    console.log("createTrip", item)
-    setIsModalCreate(true);
+    setModalMode("Create");
   };
 
   const editTrip = (item) => {
     setActiveItem(item);
     setModal(true);
-    setIsModalCreate(false);
+    setModalMode("Edit");
   };
 
   const viewTrip = (item) => {
     setActiveItem(item);
     setModal(true);
-    setIsModalCreate(false);
+    setModalMode("View");
   };
 
   const isPastDate = (end_date) => {
@@ -269,13 +268,12 @@ const App = () => {
               </Row>
               {modal && activeItem !== undefined && (
                 <Modal
-                  key={isModalCreate ? 'create-modal' : 'edit-modal'}
-                  isOpen={modal}
+                  key={modalMode ? 'create-modal' : 'edit-modal'}
                   toggle={toggleModal}
-                  isModalCreate={isModalCreate}
+                  modalMode={modalMode}
                   activeItem={activeItem}
                   setActiveItem={setActiveItem}
-                  onSave={isModalCreate ? handleAddTrip : handleEditTrip}
+                  onSave={modalMode ? handleAddTrip : handleEditTrip}
                 />
               )}
             </Container>

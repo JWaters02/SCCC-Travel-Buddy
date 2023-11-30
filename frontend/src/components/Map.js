@@ -16,6 +16,7 @@ const Map = (props) => {
     }, [map, props.latitude, props.longitude]);
 
     const onMapClick = (e) => {
+        if (props.viewOnly) return;
         const lat = e.latLng.lat();
         const lng = e.latLng.lng();
         setMarkerPosition({ lat, lng });
@@ -27,11 +28,6 @@ const Map = (props) => {
         height: '400px'
     };
 
-    const center = {
-        lat: 52.954,
-        lng: -1.252
-    };
-
     if (!map) {
         return <div>Map loading...</div>;
     }
@@ -39,7 +35,7 @@ const Map = (props) => {
     return (
         <GoogleMap
             mapContainerStyle={containerStyle}
-            center={center}
+            center={props.center}
             zoom={10}
             onClick={onMapClick}
             onLoad={map => props.onMapLoad(map)}

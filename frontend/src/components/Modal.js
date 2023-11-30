@@ -13,15 +13,18 @@ import {
 import Map from "./Map";
 import { getLocation, getUUID } from "../api";
 
-const CustomModal = ({ isModalCreate, activeItem, setActiveItem, toggle, onSave }) => {
+const CustomModal = ({ modalMode, activeItem, setActiveItem, toggle, onSave }) => {
     const [coordsSet, setCoordsSet] = useState(false);
+    const [viewOnly, setViewOnly] = useState(false);
+    const [center, setCenter] = useState({ lat: 52.954, lng: -1.252 });
 
     console.log(activeItem)
-    console.log(isModalCreate)
+    console.log(modalMode)
 
     useEffect(() => {
-        if (isModalCreate) {
-            getUUID()
+        switch (modalMode) {
+            case "Create":
+                getUUID()
                 .then((uuid) => {
                     console.log(uuid)
                     setActiveItem(prevActiveItem => ({
@@ -37,10 +40,19 @@ const CustomModal = ({ isModalCreate, activeItem, setActiveItem, toggle, onSave 
                     }));
                     console.error("UUID error", error);
                 });
-        } else {
-            setCoordsSet(true);
+                break;
+            case "Edit":
+                setCoordsSet(true);
+                setCenter({ lat: parseFloat(activeItem.latitude), lng: parseFloat(activeItem.longitude) });
+                break;
+            case "View":
+                setViewOnly(true);
+                setCenter({ lat: parseFloat(activeItem.latitude), lng: parseFloat(activeItem.longitude) });
+                break;
+            default:
+                break;
         }
-    }, [isModalCreate, setActiveItem]);
+    }, [modalMode, setActiveItem, activeItem.latitude, activeItem.longitude]);
 
     const canSubmit = () => {
         const hasRequiredProps = 'trip_name' in activeItem &&
@@ -133,6 +145,7 @@ const CustomModal = ({ isModalCreate, activeItem, setActiveItem, toggle, onSave 
                             name="trip_name"
                             value={activeItem.trip_name}
                             onChange={handleChange}
+                            disabled={viewOnly}
                             placeholder="Enter trip name"
                         />
                     </FormGroup>
@@ -144,7 +157,7 @@ const CustomModal = ({ isModalCreate, activeItem, setActiveItem, toggle, onSave 
                             name="location"
                             value={activeItem.location}
                             onChange={handleChange}
-                            disabled={true}
+                            disabled={true || viewOnly}
                             placeholder="Place a marker on the map to get the location!"
                         />
                     </FormGroup>
@@ -156,6 +169,7 @@ const CustomModal = ({ isModalCreate, activeItem, setActiveItem, toggle, onSave 
                             name="start_date"
                             value={activeItem.start_date}
                             onChange={handleChange}
+                            disabled={viewOnly}
                             placeholder="Enter trip start date"
                         />
                     </FormGroup>
@@ -167,22 +181,25 @@ const CustomModal = ({ isModalCreate, activeItem, setActiveItem, toggle, onSave 
                             name="end_date"
                             value={activeItem.end_date}
                             onChange={handleChange}
+                            disabled={viewOnly}
                             placeholder="Enter trip end date"
                         />
                     </FormGroup>
-                    <Map
-                        onMarkerPlaced={handleMarkerPositionChange}
-                        latitude={parseFloat(activeItem.latitude)}
-                        longitude={parseFloat(activeItem.longitude)}
-                        onMapLoad={handleMapLoad}
-                    />
+                        <Map
+                            onMarkerPlaced={handleMarkerPositionChange}
+                            latitude={parseFloat(activeItem.latitude)}
+                            longitude={parseFloat(activeItem.longitude)}
+                            onMapLoad={handleMapLoad}
+                            viewOnly={viewOnly}
+                            center={center}
+                        />
                     <FormGroup>
                         <Label for="trip-latitude">Latitude</Label>
                         <Input
                             type="number"
                             id="trip-latitude"
                             name="latitude"
-                            disabled={!coordsSet}
+                            disabled={!coordsSet || viewOnly}
                             value={activeItem.latitude}
                             onChange={handleChange}
                             placeholder="Place a marker on the map">
@@ -194,7 +211,7 @@ const CustomModal = ({ isModalCreate, activeItem, setActiveItem, toggle, onSave 
                             type="number"
                             id="trip-longitude"
                             name="longitude"
-                            disabled={!coordsSet}
+                            disabled={!coordsSet || viewOnly}
                             value={activeItem.longitude}
                             onChange={handleChange}
                             placeholder="Place a marker on the map">
@@ -203,13 +220,15 @@ const CustomModal = ({ isModalCreate, activeItem, setActiveItem, toggle, onSave 
                 </Form>
             </ModalBody>
             <ModalFooter>
-                <Button
+                {!viewOnly && (
+                    <Button
                     color="success"
                     onClick={() => onSave(activeItem)}
                     disabled={!canSubmit()}
-                >
-                    Save
-                </Button>
+                    >
+                        Save
+                    </Button>
+                )}
             </ModalFooter>
         </Modal>
     );
