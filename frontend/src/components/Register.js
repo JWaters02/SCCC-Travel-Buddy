@@ -1,21 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import ErrorMessagesDisplay from './ErrorMessageDisplay';
 import { register, getUUID } from '../api';
-
-const ErrorMessagesDisplay = ({ errorMessages }) => {
-    if (!errorMessages || errorMessages.length === 0) {
-        return null;
-    }
-
-    return (
-        <div className="error-messages">
-            {errorMessages.map((message, index) => (
-                <div key={index} className="error-message">
-                    {message}
-                </div>
-            ))}
-        </div>
-    );
-};
+import { Button, Form, FormGroup, Input, Container } from 'reactstrap';
 
 const Register = (props) => {
     const [userId, setUserId] = useState('');
@@ -72,46 +58,59 @@ const Register = (props) => {
     };
 
     return (
-        <div>
-            <form onSubmit={handleSubmit}>
-                <input
-                    name="userId"
-                    value={userId}
-                    onChange={handleChange}
-                    disabled={true}
-                    placeholder="User ID"
-                />
-                <input
-                    name="username"
-                    value={username}
-                    onChange={handleChange}
-                    placeholder="Username"
-                />
-                <input
-                    name="email"
-                    type="email"
-                    value={email}
-                    onChange={handleChange}
-                    placeholder="Email"
-                />
-                <input
-                    name="password"
-                    type="password"
-                    value={password}
-                    onChange={handleChange}
-                    placeholder="Password"
-                />
-                <input
-                    name="password2"
-                    type="password"
-                    value={password2}
-                    onChange={handleChange}
-                    placeholder="Confirm Password"
-                />
-                <button type="submit">Register</button>
-            </form>
+        <Container>
+            <Form onSubmit={handleSubmit}>
+                <FormGroup>
+                    <Input
+                        type="text"
+                        name="userId"
+                        value={userId}
+                        onChange={handleChange}
+                        disabled={true}
+                        placeholder="User ID"
+                    />
+                </FormGroup>
+                <FormGroup>
+                    <Input
+                        type="text"
+                        name="username"
+                        value={username}
+                        onChange={handleChange}
+                        placeholder="Username"
+                    />
+                </FormGroup>
+                <FormGroup>
+                    <Input
+                        type="email"
+                        name="email"
+                        value={email}
+                        onChange={handleChange}
+                        placeholder="Email"
+                    />
+                </FormGroup>
+                <FormGroup>
+                    <Input
+                        type="password"
+                        name="password"
+                        value={password}
+                        onChange={handleChange}
+                        placeholder="Password"
+                    />
+                </FormGroup>
+                <FormGroup>
+                    <Input
+                        type="password"
+                        name="password2"
+                        value={password2}
+                        onChange={handleChange}
+                        placeholder="Confirm Password"
+                    />
+                </FormGroup>
+                <Button type="submit" color="primary">Register</Button>
+            </Form>
+            <br />
             <ErrorMessagesDisplay errorMessages={errorMessages} />
-        </div>
+        </Container>
     );
 };
 

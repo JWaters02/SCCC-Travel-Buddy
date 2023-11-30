@@ -1,16 +1,24 @@
 import React, { useState } from 'react';
+import ErrorMessagesDisplay from './ErrorMessageDisplay';
 import { login } from '../api';
+import { Button, Form, FormGroup, Input, Container } from 'reactstrap';
 
 const Login = (props) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [errorMessages, setErrorMessages] = useState([]);
 
     const handleChange = (event) => {
         const { name, value } = event.target;
-        if (name === 'username') {
-            setUsername(value);
-        } else if (name === 'password') {
-            setPassword(value);
+        switch(name) {
+            case 'username':
+                setUsername(value);
+                break;
+            case 'password':
+                setPassword(value);
+                break;
+            default:
+                break;
         }
     };
 
@@ -18,8 +26,12 @@ const Login = (props) => {
         event.preventDefault();
         const userCredentials = { username, password };
         login(userCredentials)
-            .then(userDetails => {
-                props.onLoginSuccess(userDetails);
+            .then(response => {
+                if (response && response.status === 'error') {
+                    setErrorMessages(response.errorMessages);
+                } else {
+                    props.onLoginSuccess(response);
+                }
             })
             .catch(error => {
                 console.error("Login error", error);
@@ -27,24 +39,31 @@ const Login = (props) => {
     };
 
     return (
-        <div>
-            <form onSubmit={handleSubmit}>
-                <input
-                    name="username"
-                    value={username}
-                    onChange={handleChange}
-                    placeholder="Username"
-                />
-                <input
-                    name="password"
-                    type="password"
-                    value={password}
-                    onChange={handleChange}
-                    placeholder="Password"
-                />
-                <button type="submit">Login</button>
-            </form>
-        </div>
+        <Container>
+            <Form onSubmit={handleSubmit}>
+                <FormGroup>
+                    <Input
+                        type="text"
+                        name="username"
+                        value={username}
+                        onChange={handleChange}
+                        placeholder="Username"
+                    />
+                </FormGroup>
+                <FormGroup>
+                    <Input
+                        type="password"
+                        name="password"
+                        value={password}
+                        onChange={handleChange}
+                        placeholder="Password"
+                    />
+                </FormGroup>
+                <Button type="submit" color="primary">Login</Button>
+            </Form>
+            <br />
+            <ErrorMessagesDisplay errorMessages={errorMessages} />
+        </Container>
     );
 };
 

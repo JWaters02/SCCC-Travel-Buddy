@@ -144,6 +144,10 @@ export const login = async (loginData) => {
         Cookies.set('token', token);
         return { id: user_id, email, username };
     } catch (error) {
+        if (error.response && error.response.status === 400) {
+            const errorMessages = Object.entries(error.response.data).map(([key, value]) => `${key}: ${value}`);
+            return { status: 'error', errorMessages };
+        }
         console.error("Login error", error);
         throw error;
     }

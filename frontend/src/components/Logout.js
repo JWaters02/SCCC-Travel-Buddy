@@ -1,4 +1,5 @@
 import React from 'react';
+import { Button, Form, FormGroup, } from "reactstrap";
 import { logout } from '../api';
 
 const Logout = (props) => {
@@ -15,9 +16,11 @@ const Logout = (props) => {
 
     return (
         <div>
-            <form onSubmit={handleSubmit}>
-                <button type="submit">Logout</button>
-            </form>
+            <Form onSubmit={handleSubmit}>
+                <FormGroup>
+                    <Button>Logout</Button>
+                </FormGroup>
+            </Form>
         </div>
     );
 }

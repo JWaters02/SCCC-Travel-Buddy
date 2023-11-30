@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Button, Container, Label } from 'reactstrap';
 import Login from './Login';
 import Register from './Register';
 
@@ -10,16 +11,21 @@ const Landing = (props) => {
     };
 
     return (
-        <div>
+        <Container>
             {isLogin ? (
                 <Login onLoginSuccess={props.onLoginSuccess} />
             ) : (
                 <Register onRegisterSuccess={props.onRegisterSuccess} />
             )}
-            <button onClick={toggleLogin}>
+            <br />
+            <Label>
+                {isLogin ? 'Need an account?' : 'Already have an account?'}
+            </Label>
+            <br />
+            <Button onClick={toggleLogin} color="primary">
                 {isLogin ? 'Register' : 'Login'}
-            </button>
-        </div>
+            </Button>
+        </Container>
     );
 };
 
