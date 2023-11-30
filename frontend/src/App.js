@@ -1,5 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Card, CardBody, Button, ListGroupItem } from 'reactstrap';
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  CardBody,
+  Button,
+  ListGroupItem,
+  Dropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem
+} from 'reactstrap';
 import Modal from "./components/Modal";
 import Landing from "./components/Landing";
 import Logout from "./components/Logout";
@@ -19,6 +31,8 @@ const App = () => {
   const [currentDate] = useState(new Date().toISOString().slice(0, 19));
   const [modal, setModal] = useState(false);
   const [isModalCreate, setIsModalCreate] = useState(true);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [tripFilter, setTripFilter] = useState('All trips');
   const [activeItem, setActiveItem] = useState({
     trip_id: "",
     trip_name: "",
@@ -59,6 +73,25 @@ const App = () => {
   const toggleModal = () => {
     setModal(!modal);
   };
+
+  const toggleDropdown = () => {
+    setDropdownOpen(!dropdownOpen);
+  };
+
+  const selectTripFilter = (filter) => {
+    setTripFilter(filter);
+  };
+
+  const filteredTrips = trips.filter((trip) => {
+    switch (tripFilter) {
+      case 'My trips':
+        return trip.user_id === userDetails.id;
+      case 'Other trips':
+        return trip.user_id !== userDetails.id;
+      default:
+        return true;
+    }
+  });
 
   const handleLoginSuccess = (details) => {
     setUserDetails(details);
@@ -187,8 +220,20 @@ const App = () => {
                           Add trip
                         </Button>
                       </div>
+                      <div className="mb-4">
+                        <Dropdown isOpen={dropdownOpen} toggle={toggleDropdown}>
+                          <DropdownToggle caret>
+                            {tripFilter}
+                          </DropdownToggle>
+                          <DropdownMenu>
+                            <DropdownItem onClick={() => selectTripFilter('All trips')}>All trips</DropdownItem>
+                            <DropdownItem onClick={() => selectTripFilter('My trips')}>My trips</DropdownItem>
+                            <DropdownItem onClick={() => selectTripFilter('Other trips')}>Other trips</DropdownItem>
+                          </DropdownMenu>
+                        </Dropdown>
+                      </div>
                       <ul className="list-group list-group-flush border-top-0">
-                        {trips.map(renderTripItems)}
+                        {filteredTrips.map(renderTripItems)}
                       </ul>
                     </CardBody>
                   </Card>
