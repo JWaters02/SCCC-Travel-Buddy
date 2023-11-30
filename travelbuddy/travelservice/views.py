@@ -35,7 +35,6 @@ class LocationView(APIView):
 class UserRegistrationView(APIView):
     def post(self, request):
         serializer = UserRegistrationSerializer(data=request.data)
-        logger.info(f"UserRegistrationView: {request.data}")
         if serializer.is_valid():
             user = serializer.save(user_id=request.data.get('user_id'))
             token, created = Token.objects.get_or_create(user=user)
@@ -47,20 +46,26 @@ class UserRegistrationView(APIView):
 class UserLoginView(APIView):
     def post(self, request):
         serializer = UserLoginSerializer(data=request.data)
-        logger.info(f"UserLoginView: {request.data}")
         if serializer.is_valid():
             user = serializer.validated_data['user']
             token, created = Token.objects.get_or_create(user=user)
             return Response({'username': user.username, 'email': user.email, 'user_id': user.user_id, 'token': token.key}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+class UserLogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, format=None):
+        request.user.auth_token.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 class UserReauthView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
         return Response({'username': request.user.username, 'email': request.user.email, 'user_id': request.user.user_id}, status=status.HTTP_200_OK)
 
-class UserList(APIView):
+class UserView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
@@ -97,7 +102,7 @@ class UserList(APIView):
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-class TripList(APIView):
+class TripView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
@@ -111,3 +116,25 @@ class TripList(APIView):
             serializer.save(trip_id=request.data.get('trip_id'))
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def put(self, request, format=None):
+        try:
+            trip = Trip.objects.get(trip_id=request.data.get('trip_id'), user_id=request.user)
+            serializer = TripSerializer(trip, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Trip.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+class TripDeleteView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def delete(self, request, trip_id, format=None):
+        try:
+            trip = Trip.objects.get(trip_id=trip_id, user_id=request.user)
+            trip.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Trip.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)

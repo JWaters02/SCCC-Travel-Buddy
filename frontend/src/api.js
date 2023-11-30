@@ -88,10 +88,11 @@ export const expressInterestInTrip = async (tripId, userDetails) => {
     }
 };
 
-// Put to /api/trips/${tripId}/
+// Put to /api/trips/
 export const updateTrip = async (item, tripId, userDetails) => {
     const { tripName, latitude, longitude, startDate, endDate } = item;
     const body = {
+        trip_id: tripId,
         user_id: userDetails.id,
         trip_name: tripName,
         latitude,
@@ -101,7 +102,7 @@ export const updateTrip = async (item, tripId, userDetails) => {
     };
 
     try {
-        const response = await axiosWithAuth().put(`/api/trips/${tripId}/`, body);
+        const response = await axiosWithAuth().put(`/api/trips/`, body);
         return response.data;
     } catch (error) {
         console.error(error);
