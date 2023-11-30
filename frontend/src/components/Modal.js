@@ -18,6 +18,7 @@ const CustomModal = ({ isModalCreate, activeItemProp, toggle, onSave }) => {
     const [coordsSet, setCoordsSet] = useState(false);
 
     console.log(activeItemProp)
+    console.log(isModalCreate)
 
     useEffect(() => {
         if (isModalCreate) {
@@ -36,9 +37,10 @@ const CustomModal = ({ isModalCreate, activeItemProp, toggle, onSave }) => {
                     console.error("UUID error", error);
                 });
         } else {
+            setActiveItem(activeItemProp);
             setCoordsSet(true);
         }
-    }, [isModalCreate]);
+    }, [isModalCreate, activeItemProp]);
 
     useEffect(() => {
         setActiveItem(activeItemProp);
@@ -153,7 +155,7 @@ const CustomModal = ({ isModalCreate, activeItemProp, toggle, onSave }) => {
                     <FormGroup>
                         <Label for="trip-startDate">Start Date</Label>
                         <Input
-                            type="date"
+                            type="datetime-local"
                             id="trip-startDate"
                             name="startDate"
                             value={activeItem.startDate}
@@ -164,7 +166,7 @@ const CustomModal = ({ isModalCreate, activeItemProp, toggle, onSave }) => {
                     <FormGroup>
                         <Label for="trip-endDate">End Date</Label>
                         <Input
-                            type="date"
+                            type="datetime-local"
                             id="trip-endDate"
                             name="endDate"
                             value={activeItem.endDate}

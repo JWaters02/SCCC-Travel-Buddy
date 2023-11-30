@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Container, Row, Col, Card, CardBody, Button, ListGroupItem } from 'reactstrap';
 import Modal from "./components/Modal";
 import Landing from "./components/Landing";
 import Logout from "./components/Logout";
@@ -100,14 +101,14 @@ const App = () => {
       .catch((error) => console.log(error));
   };
 
-  const createItem = () => {
+  const createTrip = () => {
     const item = { tripName: "", location: "", startDate: "", endDate: "" };
     setActiveItem(item);
     setModal(true);
     setIsModalCreate(true);
   };
 
-  const editItem = (item) => {
+  const editTrip = (item) => {
     setActiveItem(item);
     setModal(true);
     setIsModalCreate(false);
@@ -117,10 +118,12 @@ const App = () => {
     return new Date(endDate) < new Date(currentDate);
   };
 
-  const renderItems = (item) => {
+  const renderTripItems = (item) => {
     return (
-      <li key={item.trip_id}
-        className={`list-group-item d-flex justify-content-between align-items-center ${isPastDate(item.end_date) ? "bg-light-red" : ""}`}>
+      <ListGroupItem
+        key={item.trip_id}
+        className={`d-flex justify-content-between align-items-center ${isPastDate(item.end_date) ? "bg-light-red" : ""}`}
+      >
         <span>
           <span className="mr-2">
             {item.trip_name}:
@@ -135,25 +138,28 @@ const App = () => {
             {item.end_date}
           </span>
         </span>
-        <span>
-          {isPastDate(item.end_date) || userDetails.id !== item.user_id ? null : (
-            <button
-              className="btn btn-secondary mr-2"
-              onClick={() => editItem(item)}
+        {isPastDate(item.end_date) || userDetails.id !== item.user_id ? null : (
+          <span>
+            <Button
+              color="secondary"
+              className="mr-2"
+              onClick={() => editTrip(item)}
             >
               Edit
-            </button>
-          )}
-          {userDetails.id === item.user_id && (
-            <button
-              className="btn btn-danger"
+            </Button>
+          </span>
+        )}
+        {userDetails.id === item.user_id && (
+          <span>
+            <Button
+              color="danger"
               onClick={() => handleDelete(item)}
             >
               Delete
-            </button>
-          )}
-        </span>
-      </li>
+            </Button>
+          </span>
+        )}
+      </ListGroupItem>
     );
   };
 
@@ -166,36 +172,38 @@ const App = () => {
         />
       ) : (
         <MapProvider>
-          <main className="container">
-            <Logout onLogoutSuccess={handleLogoutSuccess} />
-            <h1 className="text-white text-center my-4">Trip Manager</h1>
-            <div className="row">
-              <div className="col-md-6 col-sm-10 mx-auto p-0">
-                <div className="card p-3">
-                  <div className="mb-4">
-                    <p>Current Date: {currentDate}</p>
-                    <button
-                      className="btn btn-primary"
-                      onClick={createItem}
-                    >
-                      Add trip
-                    </button>
-                  </div>
-                  <ul className="list-group list-group-flush border-top-0">
-                    {trips.map(renderItems)}
-                  </ul>
-                </div>
-              </div>
-            </div>
-            {modal && (
-              <Modal
-                key={isModalCreate ? 'create-modal' : 'edit-modal'}
-                isModalCreate={isModalCreate}
-                activeItemProp={activeItem}
-                toggle={toggleModal}
-                onSave={isModalCreate ? handleAddTrip : handleEditTrip}
-              />
-            )}
+          <main>
+            <Container>
+              <Logout onLogoutSuccess={handleLogoutSuccess} />
+              <h1 className="text-white text-center my-4">Trip Manager</h1>
+              <Row>
+                <Col md="6" sm="10" className="mx-auto p-0">
+                  <Card>
+                    <CardBody>
+                      <div className="mb-4">
+                        <p>Current Date: {currentDate}</p>
+                        <Button color="primary" onClick={createTrip}>
+                          Add trip
+                        </Button>
+                      </div>
+                      <ul className="list-group list-group-flush border-top-0">
+                        {trips.map(renderTripItems)}
+                      </ul>
+                    </CardBody>
+                  </Card>
+                </Col>
+              </Row>
+              {modal && (
+                <Modal
+                  key={isModalCreate ? 'create-modal' : 'edit-modal'}
+                  isOpen={modal}
+                  toggle={toggleModal}
+                  isModalCreate={isModalCreate}
+                  activeItemProp={activeItem}
+                  onSave={isModalCreate ? handleAddTrip : handleEditTrip}
+                />
+              )}
+            </Container>
           </main>
         </MapProvider>
       )}
