@@ -1,49 +1,51 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import { login } from '../api';
 
-class Login extends Component {
-    state = {
-        username: '',
-        password: ''
+const Login = (props) => {
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+
+    const handleChange = (event) => {
+        const { name, value } = event.target;
+        if (name === 'username') {
+            setUsername(value);
+        } else if (name === 'password') {
+            setPassword(value);
+        }
     };
 
-    handleChange = (event) => {
-        this.setState({ [event.target.name]: event.target.value });
-    };
-
-    handleSubmit = (event) => {
+    const handleSubmit = (event) => {
         event.preventDefault();
-        login(this.state)
+        const userCredentials = { username, password };
+        login(userCredentials)
             .then(userDetails => {
-                this.props.onLoginSuccess(userDetails);
+                props.onLoginSuccess(userDetails);
             })
             .catch(error => {
                 console.error("Login error", error);
             });
     };
 
-    render() {
-        return (
-            <div>
-                <form onSubmit={this.handleSubmit}>
-                    <input
-                        name="username"
-                        value={this.state.username}
-                        onChange={this.handleChange}
-                        placeholder="Username"
-                    />
-                    <input
-                        name="password"
-                        type="password"
-                        value={this.state.password}
-                        onChange={this.handleChange}
-                        placeholder="Password"
-                    />
-                    <button type="submit">Login</button>
-                </form>
-            </div>
-        );
-    }
-}
+    return (
+        <div>
+            <form onSubmit={handleSubmit}>
+                <input
+                    name="username"
+                    value={username}
+                    onChange={handleChange}
+                    placeholder="Username"
+                />
+                <input
+                    name="password"
+                    type="password"
+                    value={password}
+                    onChange={handleChange}
+                    placeholder="Password"
+                />
+                <button type="submit">Login</button>
+            </form>
+        </div>
+    );
+};
 
 export default Login;

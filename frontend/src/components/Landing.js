@@ -1,30 +1,26 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import Login from './Login';
 import Register from './Register';
 
-class Landing extends Component {
-    state = {
-        isLogin: true
+const Landing = (props) => {
+    const [isLogin, setIsLogin] = useState(true);
+
+    const toggleLogin = () => {
+        setIsLogin(!isLogin);
     };
 
-    toggleLogin = () => {
-        this.setState({ isLogin: !this.state.isLogin });
-    };
-
-    render() {
-        return (
-            <div>
-                {this.state.isLogin ? (
-                    <Login onLoginSuccess={this.props.onLoginSuccess} />
-                ) : (
-                    <Register onRegisterSuccess={this.props.onRegisterSuccess} />
-                )}
-                <button onClick={this.toggleLogin}>
-                    {this.state.isLogin ? 'Register' : 'Login'}
-                </button>
-            </div>
-        );
-    }
-}
+    return (
+        <div>
+            {isLogin ? (
+                <Login onLoginSuccess={props.onLoginSuccess} />
+            ) : (
+                <Register onRegisterSuccess={props.onRegisterSuccess} />
+            )}
+            <button onClick={toggleLogin}>
+                {isLogin ? 'Register' : 'Login'}
+            </button>
+        </div>
+    );
+};
 
 export default Landing;
