@@ -18,20 +18,15 @@ const CustomModal = ({ modalMode, activeItem, setActiveItem, toggle, onSave }) =
     const [viewOnly, setViewOnly] = useState(false);
     const [center, setCenter] = useState({ lat: 52.954, lng: -1.252 });
 
-    console.log(activeItem)
-    console.log(modalMode)
-
     useEffect(() => {
         switch (modalMode) {
             case "Create":
                 getUUID()
                 .then((uuid) => {
-                    console.log(uuid)
                     setActiveItem(prevActiveItem => ({
                         ...prevActiveItem,
                         trip_id: uuid["uuid"],
                     }));
-                    console.log("activeItem");
                 })
                 .catch((error) => {
                     setActiveItem(prevActiveItem => ({

@@ -102,7 +102,7 @@ class UserView(APIView):
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-class TripView(APIView):
+class TripsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
@@ -110,16 +110,27 @@ class TripView(APIView):
         serializer = TripSerializer(trips, many=True)
         return Response(serializer.data)
 
-    def post(self, request, format=None):
+class TripView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, trip_id, format=None):
+        try:
+            trip = Trip.objects.get(trip_id=trip_id, user_id=request.user)
+            serializer = TripSerializer(trip)
+            return Response(serializer.data)
+        except Trip.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def post(self, request, trip_id, format=None):
         serializer = TripSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(trip_id=request.data.get('trip_id'))
+            serializer.save(trip_id=trip_id)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    def put(self, request, format=None):
+    def put(self, request, trip_id, format=None):
         try:
-            trip = Trip.objects.get(trip_id=request.data.get('trip_id'), user_id=request.user)
+            trip = Trip.objects.get(trip_id=trip_id, user_id=request.user)
             serializer = TripSerializer(trip, data=request.data)
             if serializer.is_valid():
                 serializer.save()
@@ -127,9 +138,6 @@ class TripView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Trip.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
-
-class TripDeleteView(APIView):
-    permission_classes = [IsAuthenticated]
     
     def delete(self, request, trip_id, format=None):
         try:

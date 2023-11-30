@@ -40,11 +40,20 @@ export const getLocation = async (latitude, longitude) => {
     }
 };
 
-// Post to /api/trips/
+// Get from /api/trips/${tripId}/
+export const getTrip = async (tripId) => {
+    try {
+        const response = await axiosWithAuth().get(`/api/trips/${tripId}/`);
+        return response.data;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+// Post to /api/trips/${tripId}/
 export const addTrip = async (item, userDetails) => {
     const { tripId, tripName, location, latitude, longitude, startDate, endDate } = item;
     const body = {
-        trip_id: tripId,
         user_id: userDetails.id,
         trip_name: tripName,
         location,
@@ -55,7 +64,37 @@ export const addTrip = async (item, userDetails) => {
     };
 
     try {
-        const response = await axiosWithAuth().post("/api/trips/", body);
+        const response = await axiosWithAuth().post(`/api/trips/${tripId}/`, body);
+        return response.data;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+// Put to /api/trips/${tripId}/
+export const updateTrip = async (item, tripId, userDetails) => {
+    const { tripName, latitude, longitude, startDate, endDate } = item;
+    const body = {
+        user_id: userDetails.id,
+        trip_name: tripName,
+        latitude,
+        longitude,
+        start_date: startDate,
+        end_date: endDate
+    };
+
+    try {
+        const response = await axiosWithAuth().put(`/api/trips/${tripId}/`, body);
+        return response.data;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+// Delete from /api/trips/${tripId}/
+export const deleteTrip = async (tripId) => {
+    try {
+        const response = await axiosWithAuth().delete(`/api/trips/${tripId}/`);
         return response.data;
     } catch (error) {
         console.error(error);
@@ -84,37 +123,6 @@ export const expressInterestInTrip = async (tripId, userDetails) => {
         return response.data;
     }
     catch (error) {
-        console.error(error);
-    }
-};
-
-// Put to /api/trips/
-export const updateTrip = async (item, tripId, userDetails) => {
-    const { tripName, latitude, longitude, startDate, endDate } = item;
-    const body = {
-        trip_id: tripId,
-        user_id: userDetails.id,
-        trip_name: tripName,
-        latitude,
-        longitude,
-        start_date: startDate,
-        end_date: endDate
-    };
-
-    try {
-        const response = await axiosWithAuth().put(`/api/trips/`, body);
-        return response.data;
-    } catch (error) {
-        console.error(error);
-    }
-};
-
-// Delete from /api/trips/${tripId}/
-export const deleteTrip = async (tripId) => {
-    try {
-        const response = await axiosWithAuth().delete(`/api/trips/${tripId}/`);
-        return response.data;
-    } catch (error) {
         console.error(error);
     }
 };

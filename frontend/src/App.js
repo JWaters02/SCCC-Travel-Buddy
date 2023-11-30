@@ -159,7 +159,7 @@ const App = () => {
     switch (tripFilter) {
       case 'My trips':
         return trip.user_id === userDetails.id;
-      case 'Other trips':
+      case 'Public trips':
         return trip.user_id !== userDetails.id;
       default:
         return true;
@@ -240,6 +240,7 @@ const App = () => {
                     <CardBody>
                       <div className="mb-4">
                         <p>Current Date: {currentDate}</p>
+                        <p>Welcome {userDetails.username}!</p>
                         <Button color="primary" onClick={createTrip}>
                           Add trip
                         </Button>
