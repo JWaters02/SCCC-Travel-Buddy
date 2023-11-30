@@ -33,6 +33,7 @@ const App = () => {
   const [isModalCreate, setIsModalCreate] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [tripFilter, setTripFilter] = useState('All trips');
+  const [showEndedTrips, setShowEndedTrips] = useState(false);
   const [activeItem, setActiveItem] = useState({
     trip_id: "",
     trip_name: "",
@@ -78,20 +79,13 @@ const App = () => {
     setDropdownOpen(!dropdownOpen);
   };
 
+  const toggleEndedTrips = () => {
+    setShowEndedTrips(!showEndedTrips);
+  };
+
   const selectTripFilter = (filter) => {
     setTripFilter(filter);
   };
-
-  const filteredTrips = trips.filter((trip) => {
-    switch (tripFilter) {
-      case 'My trips':
-        return trip.user_id === userDetails.id;
-      case 'Other trips':
-        return trip.user_id !== userDetails.id;
-      default:
-        return true;
-    }
-  });
 
   const handleLoginSuccess = (details) => {
     setUserDetails(details);
@@ -148,9 +142,30 @@ const App = () => {
     setIsModalCreate(false);
   };
 
+  const viewTrip = (item) => {
+    setActiveItem(item);
+    setModal(true);
+    setIsModalCreate(false);
+  };
+
   const isPastDate = (end_date) => {
     return new Date(end_date) < new Date(currentDate);
   };
+
+  const filteredTrips = trips.filter((trip) => {
+    if (!showEndedTrips && isPastDate(trip.end_date)) {
+      return false;
+    }
+
+    switch (tripFilter) {
+      case 'My trips':
+        return trip.user_id === userDetails.id;
+      case 'Other trips':
+        return trip.user_id !== userDetails.id;
+      default:
+        return true;
+    }
+  });
 
   const renderTripItems = (item) => {
     return (
@@ -193,6 +208,16 @@ const App = () => {
             </Button>
           </span>
         )}
+        {userDetails.id !== item.user_id && (
+          <span>
+            <Button
+              color="info"
+              onClick={() => viewTrip(item)}
+            >
+              View
+            </Button>
+          </span>
+        )}
       </ListGroupItem>
     );
   };
@@ -220,7 +245,7 @@ const App = () => {
                           Add trip
                         </Button>
                       </div>
-                      <div className="mb-4">
+                      <div className="mb-4 d-flex align-items-center">
                         <Dropdown isOpen={dropdownOpen} toggle={toggleDropdown}>
                           <DropdownToggle caret>
                             {tripFilter}
@@ -228,9 +253,12 @@ const App = () => {
                           <DropdownMenu>
                             <DropdownItem onClick={() => selectTripFilter('All trips')}>All trips</DropdownItem>
                             <DropdownItem onClick={() => selectTripFilter('My trips')}>My trips</DropdownItem>
-                            <DropdownItem onClick={() => selectTripFilter('Other trips')}>Other trips</DropdownItem>
+                            <DropdownItem onClick={() => selectTripFilter('Public trips')}>Public trips</DropdownItem>
                           </DropdownMenu>
                         </Dropdown>
+                        <Button color="info" onClick={toggleEndedTrips} className="ml-2">
+                          {showEndedTrips ? 'Hide Ended Trips' : 'Show Ended Trips'}
+                        </Button>
                       </div>
                       <ul className="list-group list-group-flush border-top-0">
                         {filteredTrips.map(renderTripItems)}
