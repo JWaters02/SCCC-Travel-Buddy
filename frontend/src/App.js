@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Modal from "./components/Modal";
 import Landing from "./components/Landing";
+import Logout from "./components/Logout";
 import MapProvider from "./components/MapProvider";
 import { addTrip, updateTrip, deleteTrip, getTrips, reauthenticate } from "./api";
 import Cookies from "js-cookie";
@@ -14,8 +15,7 @@ const App = () => {
   });
   const [trips, setTrips] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isLogin, setIsLogin] = useState(true);
-  const [currentDate, setCurrentDate] = useState(new Date().toISOString().slice(0, 19));
+  const [currentDate] = useState(new Date().toISOString().slice(0, 19));
   const [modal, setModal] = useState(false);
   const [isModalCreate, setIsModalCreate] = useState(true);
   const [activeItem, setActiveItem] = useState({
@@ -65,6 +65,15 @@ const App = () => {
     refreshTripsList();
   };
 
+  const handleLogoutSuccess = () => {
+    setIsLoggedIn(false);
+    setUserDetails({
+      id: "",
+      email: "",
+      username: "",
+    });
+  };
+
   const handleAddTrip = (item) => {
     toggleModal();
     addTrip(item, userDetails)
@@ -108,10 +117,6 @@ const App = () => {
     return new Date(endDate) < new Date(currentDate);
   };
 
-  const toggleLogin = () => {
-    setIsLogin(!isLogin);
-  };
-
   const renderItems = (item) => {
     return (
       <li key={item.trip_id}
@@ -131,18 +136,22 @@ const App = () => {
           </span>
         </span>
         <span>
-          <button
-            className="btn btn-secondary mr-2"
-            onClick={() => editItem(item)}
-          >
-            Edit
-          </button>
-          <button
-            className="btn btn-danger"
-            onClick={() => handleDelete(item)}
-          >
-            Delete
-          </button>
+          {isPastDate(item.end_date) || userDetails.id !== item.user_id ? null : (
+            <button
+              className="btn btn-secondary mr-2"
+              onClick={() => editItem(item)}
+            >
+              Edit
+            </button>
+          )}
+          {userDetails.id === item.user_id && (
+            <button
+              className="btn btn-danger"
+              onClick={() => handleDelete(item)}
+            >
+              Delete
+            </button>
+          )}
         </span>
       </li>
     );
@@ -158,6 +167,7 @@ const App = () => {
       ) : (
         <MapProvider>
           <main className="container">
+            <Logout onLogoutSuccess={handleLogoutSuccess} />
             <h1 className="text-white text-center my-4">Trip Manager</h1>
             <div className="row">
               <div className="col-md-6 col-sm-10 mx-auto p-0">

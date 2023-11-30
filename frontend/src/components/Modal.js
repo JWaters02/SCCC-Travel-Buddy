@@ -17,6 +17,8 @@ const CustomModal = ({ isModalCreate, activeItemProp, toggle, onSave }) => {
     const [activeItem, setActiveItem] = useState(activeItemProp);
     const [coordsSet, setCoordsSet] = useState(false);
 
+    console.log(activeItemProp)
+
     useEffect(() => {
         if (isModalCreate) {
             getUUID()
