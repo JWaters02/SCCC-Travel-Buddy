@@ -13,12 +13,9 @@ import {
 import Map from "./Map";
 import { getLocation, getUUID } from "../api";
 
-const CustomModal = ({ isModalCreate, activeItemProp, toggle, onSave, onMarkerPlaced }) => {
+const CustomModal = ({ isModalCreate, activeItemProp, toggle, onSave }) => {
     const [activeItem, setActiveItem] = useState(activeItemProp);
     const [coordsSet, setCoordsSet] = useState(false);
-
-    console.log("isModalCreate", isModalCreate);
-    console.log("activeItemProp", activeItemProp);
 
     useEffect(() => {
         if (isModalCreate) {
@@ -67,8 +64,28 @@ const CustomModal = ({ isModalCreate, activeItemProp, toggle, onSave, onMarkerPl
         const { name, value } = e.target;
         setActiveItem(prevActiveItem => ({
             ...prevActiveItem,
-            [name]: value
+            [name]: value,
         }));
+    
+        if (name === 'latitude' || name === 'longitude') {
+            updateLocationFromCoords();
+        }
+    };
+    
+    const updateLocationFromCoords = () => {
+        const lat = parseFloat(activeItem.latitude);
+        const lon = parseFloat(activeItem.longitude);
+    
+        getLocation(lat, lon)
+            .then(location => {
+                setActiveItem(prevActiveItem => ({
+                    ...prevActiveItem,
+                    location
+                }));
+            })
+            .catch(error => {
+                console.error("Location error", error);
+            });
     };
 
     const handleMarkerPositionChange = (lat, lon) => {
@@ -90,18 +107,6 @@ const CustomModal = ({ isModalCreate, activeItemProp, toggle, onSave, onMarkerPl
     const handleMapLoad = (map) => {
         //console.log("Map loaded!", map);
     };
-
-    const handleCoordinateChange = (e) => {
-        const { name, value } = e.target;
-        setActiveItem(prevActiveItem => ({
-            ...prevActiveItem,
-            [name]: parseFloat(value) || ''
-        }));
-    
-        if (!isNaN(activeItem.latitude) && !isNaN(activeItem.longitude)) {
-            onMarkerPlaced(activeItem.latitude, activeItem.longitude);
-        }
-    };    
 
     return (
         <Modal isOpen={true} toggle={toggle}>

@@ -94,7 +94,6 @@ const App = () => {
   const createItem = () => {
     const item = { tripName: "", location: "", startDate: "", endDate: "" };
     setActiveItem(item);
-    console.log("createItem in App.js", item)
     setModal(true);
     setIsModalCreate(true);
   };
@@ -103,7 +102,6 @@ const App = () => {
     setActiveItem(item);
     setModal(true);
     setIsModalCreate(false);
-    console.log("editItem in App.js", item);
   };
 
   const isPastDate = (endDate) => {
