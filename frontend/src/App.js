@@ -6,7 +6,6 @@ import {
   Card,
   CardBody,
   Button,
-  ListGroupItem,
   Modal,
   ModalHeader,
   ModalBody,
@@ -47,6 +46,7 @@ const App = () => {
   const [tripFilter, setTripFilter] = useState('All trips');
   const [showEndedTrips, setShowEndedTrips] = useState(false);
   const [selectedTripForDeletion, setSelectedTripForDeletion] = useState(null);
+  const [openPopover, setOpenPopover] = useState(null);
   const [alerts, setAlerts] = useState({
     errorMessage: "",
     warningMessage: "",
@@ -107,6 +107,10 @@ const App = () => {
 
   const toggleEndedTrips = () => {
     setShowEndedTrips(!showEndedTrips);
+  };
+
+  const togglePopover = (tripId) => {
+    setOpenPopover(tripId ? `Popover-${tripId}` : null);
   };
 
   const selectTripFilter = (filter) => {
@@ -232,19 +236,16 @@ const App = () => {
 
   const renderTripItems = (item) => {
     return (
-      <ListGroupItem
-        key={item.trip_id}
-        className={`d-flex justify-content-between align-items-center ${isPastDate(item.end_date) ? "bg-light-red" : ""}`}
-      >
-        <Trip
-          trip={item}
-          isPastDate={isPastDate}
-          editTrip={editTrip}
-          handleDelete={handleDelete}
-          viewTrip={viewTrip}
-          userDetails={userDetails}
-        />
-      </ListGroupItem>
+      <Trip
+        trip={item}
+        isPastDate={isPastDate}
+        editTrip={editTrip}
+        handleDelete={handleDelete}
+        viewTrip={viewTrip}
+        userDetails={userDetails}
+        popoverOpen={openPopover}
+        togglePopover={togglePopover}
+      />
     );
   };
 
