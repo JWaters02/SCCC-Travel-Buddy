@@ -17,6 +17,7 @@ import {
   DropdownItem
 } from 'reactstrap';
 import CustomModal from "./components/Modal";
+import Trip from "./components/Trip";
 import Landing from "./components/Landing";
 import Logout from "./components/Logout";
 import MapProvider from "./components/MapProvider";
@@ -235,38 +236,14 @@ const App = () => {
         key={item.trip_id}
         className={`d-flex justify-content-between align-items-center ${isPastDate(item.end_date) ? "bg-light-red" : ""}`}
       >
-        <span>
-          <span className="mr-2">
-            {item.trip_name}:
-          </span>
-          <span className="mr-2">
-            {item.location},
-          </span>
-          <span className="mr-2">
-            {item.start_date}
-          </span>
-          <span className="mr-2">
-            {item.end_date}
-          </span>
-          <span className="mr-2">
-            {item.interests}
-          </span>
-        </span>
-        {isPastDate(item.end_date) || userDetails.id !== item.user_id ? null : (
-          <span>
-            <Button color="secondary" className="mr-2" onClick={() => editTrip(item)}>Edit</Button>
-          </span>
-        )}
-        {userDetails.id === item.user_id && (
-          <span>
-            <Button color="danger" onClick={() => handleDelete(item)}>Delete</Button>
-          </span>
-        )}
-        {userDetails.id !== item.user_id && (
-          <span>
-            <Button color="info" onClick={() => viewTrip(item)}>View</Button>
-          </span>
-        )}
+        <Trip
+          trip={item}
+          isPastDate={isPastDate}
+          editTrip={editTrip}
+          handleDelete={handleDelete}
+          viewTrip={viewTrip}
+          userDetails={userDetails}
+        />
       </ListGroupItem>
     );
   };
@@ -275,7 +252,7 @@ const App = () => {
     <div>
       <main>
         <Container>
-          <h1 className="text-black text-center my-4">Trip Manager</h1>
+          <h1 className="text-black text-center my-4">Travel Buddy Trip Manager</h1>
           <Row>
             <Col className="mx-auto p-0 card-container">
               <Card>
