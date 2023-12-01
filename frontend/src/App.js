@@ -16,13 +16,13 @@ import Modal from "./components/Modal";
 import Landing from "./components/Landing";
 import Logout from "./components/Logout";
 import MapProvider from "./components/MapProvider";
-import { 
-  addTrip, 
-  updateTrip, 
-  deleteTrip, 
-  getTrips, 
-  reauthenticate, 
-  expressInterestInTrip 
+import {
+  addTrip,
+  updateTrip,
+  deleteTrip,
+  getTrips,
+  reauthenticate,
+  expressInterestInTrip
 } from "./api";
 import Cookies from "js-cookie";
 import './App.css';
@@ -41,6 +41,11 @@ const App = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [tripFilter, setTripFilter] = useState('All trips');
   const [showEndedTrips, setShowEndedTrips] = useState(false);
+  const [alerts, setAlerts] = useState({
+    errorMessage: "",
+    warningMessage: "",
+    successMessage: ""
+  });
   const [activeItem, setActiveItem] = useState({
     trip_id: "",
     trip_name: "",
@@ -81,6 +86,13 @@ const App = () => {
 
   const toggleModal = () => {
     setModal(!modal);
+    if (modal) {
+      setAlerts({
+        errorMessage: "",
+        warningMessage: "",
+        successMessage: ""
+      });
+    }
   };
 
   const toggleDropdown = () => {
@@ -112,10 +124,18 @@ const App = () => {
 
   const handleRegisterInterest = (item) => {
     expressInterestInTrip(item.trip_id, userDetails)
-      .then(() => {
-        refreshTripsList();
+      .then(response => {
+        if (response.status === 'error') {
+          setAlerts({ warningMessage: response.errorMessages.join(", ") });
+        } else {
+          setAlerts({ successMessage: "Successfully registered interest!" });
+          refreshTripsList();
+        }
       })
-      .catch((error) => console.log(error));
+      .catch((error) => {
+        setAlerts({ errorMessage: error.toString() });
+        console.log(error)
+      });
   }
 
   const handleAddTrip = (item) => {
@@ -282,7 +302,7 @@ const App = () => {
                         {filteredTrips.map(renderTripItems)}
                       </ul>
                       <br />
-                      <Logout onLogoutSuccess={handleLogoutSuccess}/>
+                      <Logout onLogoutSuccess={handleLogoutSuccess} />
                     </CardBody>
                   </Card>
                 </Col>
@@ -302,6 +322,7 @@ const App = () => {
                   }}
                   isPastDate={isPastDate}
                   onInterested={handleRegisterInterest}
+                  alerts={alerts}
                 />
               )}
             </Container>

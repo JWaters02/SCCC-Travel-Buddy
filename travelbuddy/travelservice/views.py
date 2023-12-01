@@ -146,3 +146,22 @@ class TripView(APIView):
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Trip.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+        
+class InterestsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, trip_id, format=None):
+        try:
+            trip = Trip.objects.get(trip_id=trip_id)
+            user_id_str = str(request.user.user_id)
+            current_users_interested = trip.users_interested if trip.users_interested else []
+            if user_id_str in trip.users_interested:
+                return Response({'warning': 'User has already expressed interest in this trip.'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            trip.interests += 1
+            current_users_interested.append(user_id_str)
+            trip.users_interested = current_users_interested
+            trip.save()
+            return Response({'interests': trip.interests})
+        except Trip.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)

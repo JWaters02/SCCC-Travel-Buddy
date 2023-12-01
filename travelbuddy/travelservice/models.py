@@ -17,3 +17,4 @@ class Trip(models.Model):
     end_date = models.DateTimeField()
     weather_forcast = models.JSONField(blank=True, default=dict)
     interests = models.IntegerField(default=0)
+    users_interested = models.JSONField(blank=True, default=list)

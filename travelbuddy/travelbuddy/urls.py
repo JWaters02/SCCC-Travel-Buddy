@@ -24,6 +24,7 @@ urlpatterns = [
     path('api/location/', views.LocationView.as_view(), name='location'),
     path('api/trips/', views.TripsView.as_view(), name='trips'),
     path('api/trips/<uuid:trip_id>/', views.TripView.as_view(), name='trip'),
+    path('api/interests/<uuid:trip_id>', views.InterestsView.as_view(), name='interests'),
     path('api/users/', views.UserView.as_view(), name='user-list'),
     path('api/register/', views.UserRegistrationView.as_view(), name='register'),
     path('api/login/', views.UserLoginView.as_view(), name='login'),

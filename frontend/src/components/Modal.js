@@ -11,9 +11,10 @@ import {
     Label,
 } from "reactstrap";
 import Map from "./Map";
+import { ErrorMessagesDisplay, WarningMessageDisplay, SuccessMessageDisplay } from "./AlertDisplays";
 import { getLocation, getUUID } from "../api";
 
-const CustomModal = ({ modalMode, activeItem, setActiveItem, toggle, onSave, isPastDate, onInterested }) => {
+const CustomModal = ({ modalMode, activeItem, setActiveItem, toggle, onSave, isPastDate, onInterested, alerts }) => {
     const [coordsSet, setCoordsSet] = useState(false);
     const [viewOnly, setViewOnly] = useState(false);
     const [center, setCenter] = useState({ lat: 52.954, lng: -1.252 });
@@ -237,6 +238,10 @@ const CustomModal = ({ modalMode, activeItem, setActiveItem, toggle, onSave, isP
                         Register interest
                     </Button>
                 )}
+                <br />
+                {alerts.errorMessage && <ErrorMessagesDisplay errorMessages={[alerts.errorMessage]} />}
+                {alerts.warningMessage && <WarningMessageDisplay warningMessages={[alerts.warningMessage]} />}
+                {alerts.successMessage && <SuccessMessageDisplay successMessages={[alerts.successMessage]} />}
             </ModalFooter>
         </Modal>
     );

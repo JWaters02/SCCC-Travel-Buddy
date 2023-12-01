@@ -105,25 +105,27 @@ export const deleteTrip = async (trip_id) => {
 export const getTrips = async () => {
     try {
         const response = await axiosWithAuth().get("/api/trips/");
-        console.log(response.data);
         return response.data;
     } catch (error) {
         console.error(error);
     }
 };
 
-// Post to /api/interests/
+// Post to /api/interests/${trip_id}/
 export const expressInterestInTrip = async (trip_id, userDetails) => {
     const body = {
-        user_id: userDetails.id,
-        trip_id: trip_id
+        user_id: userDetails.id
     };
 
     try {
-        const response = await axiosWithAuth().post("/api/interests/", body);
+        const response = await axiosWithAuth().post(`/api/interests/${trip_id}`, body);
         return response.data;
     }
     catch (error) {
+        if (error.response && error.response.status === 400) {
+            const errorMessages = Object.entries(error.response.data).map(([key, value]) => `${key}: ${value}`);
+            return { status: 'error', errorMessages };
+        }
         console.error(error);
     }
 };
