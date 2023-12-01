@@ -145,7 +145,7 @@ const CustomModal = ({ modalMode, activeItem, setActiveItem, toggle, onSave, isP
 
     return (
         <Modal isOpen={true} toggle={toggle}>
-            <ModalHeader toggle={toggle}>Trips</ModalHeader>
+            <ModalHeader toggle={toggle}>Trip Information</ModalHeader>
             <ModalBody>
                 <Form>
                     <FormGroup>
