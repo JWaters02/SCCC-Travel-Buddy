@@ -16,7 +16,14 @@ import Modal from "./components/Modal";
 import Landing from "./components/Landing";
 import Logout from "./components/Logout";
 import MapProvider from "./components/MapProvider";
-import { addTrip, updateTrip, deleteTrip, getTrips, reauthenticate } from "./api";
+import { 
+  addTrip, 
+  updateTrip, 
+  deleteTrip, 
+  getTrips, 
+  reauthenticate, 
+  expressInterestInTrip 
+} from "./api";
 import Cookies from "js-cookie";
 import './App.css';
 
@@ -42,6 +49,7 @@ const App = () => {
     latitude: 0.0,
     start_date: "",
     end_date: "",
+    interests: 0,
   });
 
   useEffect(() => {
@@ -101,6 +109,14 @@ const App = () => {
       username: "",
     });
   };
+
+  const handleRegisterInterest = (item) => {
+    expressInterestInTrip(item.trip_id, userDetails)
+      .then(() => {
+        refreshTripsList();
+      })
+      .catch((error) => console.log(error));
+  }
 
   const handleAddTrip = (item) => {
     toggleModal();
@@ -184,6 +200,9 @@ const App = () => {
           </span>
           <span className="mr-2">
             {item.end_date}
+          </span>
+          <span className="mr-2">
+            {item.interests}
           </span>
         </span>
         {isPastDate(item.end_date) || userDetails.id !== item.user_id ? null : (
@@ -281,6 +300,8 @@ const App = () => {
                       handleEditTrip(activeItem);
                     }
                   }}
+                  isPastDate={isPastDate}
+                  onInterested={handleRegisterInterest}
                 />
               )}
             </Container>

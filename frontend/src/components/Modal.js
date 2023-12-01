@@ -13,33 +13,33 @@ import {
 import Map from "./Map";
 import { getLocation, getUUID } from "../api";
 
-const CustomModal = ({ modalMode, activeItem, setActiveItem, toggle, onSave }) => {
+const CustomModal = ({ modalMode, activeItem, setActiveItem, toggle, onSave, isPastDate, onInterested }) => {
     const [coordsSet, setCoordsSet] = useState(false);
     const [viewOnly, setViewOnly] = useState(false);
     const [center, setCenter] = useState({ lat: 52.954, lng: -1.252 });
-    const [setId, setSetId] = useState(false);
+    const [isIdSet, setIsIdSet] = useState(false);
 
     useEffect(() => {
         switch (modalMode) {
             case "Create":
-                if (setId) {
+                if (isIdSet) {
                     break;
                 }
                 getUUID()
-                .then((uuid) => {
-                    setActiveItem(prevActiveItem => ({
-                        ...prevActiveItem,
-                        trip_id: uuid["uuid"],
-                    }));
-                    setSetId(true);
-                })
-                .catch((error) => {
-                    setActiveItem(prevActiveItem => ({
-                        ...prevActiveItem,
-                        trip_id: 'error - please refresh the page',
-                    }));
-                    console.error("UUID error", error);
-                });
+                    .then((uuid) => {
+                        setActiveItem(prevActiveItem => ({
+                            ...prevActiveItem,
+                            trip_id: uuid["uuid"],
+                        }));
+                        setIsIdSet(true);
+                    })
+                    .catch((error) => {
+                        setActiveItem(prevActiveItem => ({
+                            ...prevActiveItem,
+                            trip_id: 'error - please refresh the page',
+                        }));
+                        console.error("UUID error", error);
+                    });
                 break;
             case "Edit":
                 setCoordsSet(true);
@@ -52,7 +52,7 @@ const CustomModal = ({ modalMode, activeItem, setActiveItem, toggle, onSave }) =
             default:
                 break;
         }
-    }, [modalMode, setActiveItem, activeItem.latitude, activeItem.longitude]);
+    }, [modalMode, setActiveItem, isIdSet, activeItem.latitude, activeItem.longitude]);
 
     const canSubmit = () => {
         const hasRequiredProps = 'trip_name' in activeItem &&
@@ -60,15 +60,15 @@ const CustomModal = ({ modalMode, activeItem, setActiveItem, toggle, onSave }) =
             'end_date' in activeItem &&
             'latitude' in activeItem &&
             'longitude' in activeItem;
-    
+
         if (!hasRequiredProps) {
             return false;
         }
-        
+
         const tripNameIsValid = activeItem.trip_name.length > 0 && activeItem.trip_name.length <= 100;
         const datesAreValid = activeItem.start_date && activeItem.end_date && new Date(activeItem.start_date) <= new Date(activeItem.end_date);
         const inputsAreNotEmpty = activeItem.trip_name && activeItem.start_date && activeItem.end_date && activeItem.latitude && activeItem.longitude;
-    
+
         return tripNameIsValid && datesAreValid && coordsSet && inputsAreNotEmpty;
     };
 
@@ -78,16 +78,16 @@ const CustomModal = ({ modalMode, activeItem, setActiveItem, toggle, onSave }) =
             ...prevActiveItem,
             [name]: value,
         }));
-    
+
         if (name === 'latitude' || name === 'longitude') {
             updateLocationFromCoords();
         }
     };
-    
+
     const updateLocationFromCoords = () => {
         const lat = parseFloat(activeItem.latitude);
         const lon = parseFloat(activeItem.longitude);
-    
+
         getLocation(lat, lon)
             .then(location => {
                 setActiveItem(prevActiveItem => ({
@@ -106,15 +106,15 @@ const CustomModal = ({ modalMode, activeItem, setActiveItem, toggle, onSave }) =
                 setActiveItem(prevActiveItem => ({
                     ...prevActiveItem,
                     location,
-                    latitude: parseFloat(lat.toFixed(2)),
-                    longitude: parseFloat(lon.toFixed(2)),
+                    latitude: parseFloat(lat.toFixed(3)),
+                    longitude: parseFloat(lon.toFixed(3)),
                 }));
                 setCoordsSet(true);
             })
             .catch(error => {
                 console.error("Location error", error);
             });
-    };    
+    };
 
     const handleMapLoad = (map) => {
         //console.log("Map loaded!", map);
@@ -185,14 +185,14 @@ const CustomModal = ({ modalMode, activeItem, setActiveItem, toggle, onSave }) =
                             placeholder="Enter trip end date"
                         />
                     </FormGroup>
-                        <Map
-                            onMarkerPlaced={handleMarkerPositionChange}
-                            latitude={parseFloat(activeItem.latitude)}
-                            longitude={parseFloat(activeItem.longitude)}
-                            onMapLoad={handleMapLoad}
-                            viewOnly={viewOnly}
-                            center={center}
-                        />
+                    <Map
+                        onMarkerPlaced={handleMarkerPositionChange}
+                        latitude={parseFloat(activeItem.latitude)}
+                        longitude={parseFloat(activeItem.longitude)}
+                        onMapLoad={handleMapLoad}
+                        viewOnly={viewOnly}
+                        center={center}
+                    />
                     <FormGroup>
                         <Label for="trip-latitude">Latitude</Label>
                         <Input
@@ -222,11 +222,19 @@ const CustomModal = ({ modalMode, activeItem, setActiveItem, toggle, onSave }) =
             <ModalFooter>
                 {!viewOnly && (
                     <Button
-                    color="success"
-                    onClick={() => onSave(activeItem)}
-                    disabled={!canSubmit()}
+                        color="success"
+                        onClick={() => onSave(activeItem)}
+                        disabled={!canSubmit()}
                     >
                         Save
+                    </Button>
+                )}
+                {viewOnly && !isPastDate(activeItem.end_date) && (
+                    <Button
+                        color="success"
+                        onClick={() => onInterested(activeItem)}
+                    >
+                        Register interest
                     </Button>
                 )}
             </ModalFooter>
