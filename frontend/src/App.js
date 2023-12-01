@@ -7,12 +7,16 @@ import {
   CardBody,
   Button,
   ListGroupItem,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
   Dropdown,
   DropdownToggle,
   DropdownMenu,
   DropdownItem
 } from 'reactstrap';
-import Modal from "./components/Modal";
+import CustomModal from "./components/Modal";
 import Landing from "./components/Landing";
 import Logout from "./components/Logout";
 import MapProvider from "./components/MapProvider";
@@ -41,6 +45,7 @@ const App = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [tripFilter, setTripFilter] = useState('All trips');
   const [showEndedTrips, setShowEndedTrips] = useState(false);
+  const [selectedTripForDeletion, setSelectedTripForDeletion] = useState(null);
   const [alerts, setAlerts] = useState({
     errorMessage: "",
     warningMessage: "",
@@ -157,11 +162,18 @@ const App = () => {
   };
 
   const handleDelete = (item) => {
-    deleteTrip(item.trip_id)
-      .then(() => {
-        refreshTripsList();
-      })
-      .catch((error) => console.log(error));
+    setSelectedTripForDeletion(item);
+  };
+
+  const confirmDelete = () => {
+    if (selectedTripForDeletion) {
+      deleteTrip(selectedTripForDeletion.trip_id)
+        .then(() => {
+          refreshTripsList();
+          setSelectedTripForDeletion(null);
+        })
+        .catch((error) => console.log(error));
+    }
   };
 
   const createTrip = () => {
@@ -242,33 +254,17 @@ const App = () => {
         </span>
         {isPastDate(item.end_date) || userDetails.id !== item.user_id ? null : (
           <span>
-            <Button
-              color="secondary"
-              className="mr-2"
-              onClick={() => editTrip(item)}
-            >
-              Edit
-            </Button>
+            <Button color="secondary" className="mr-2" onClick={() => editTrip(item)}>Edit</Button>
           </span>
         )}
         {userDetails.id === item.user_id && (
           <span>
-            <Button
-              color="danger"
-              onClick={() => handleDelete(item)}
-            >
-              Delete
-            </Button>
+            <Button color="danger" onClick={() => handleDelete(item)}>Delete</Button>
           </span>
         )}
         {userDetails.id !== item.user_id && (
           <span>
-            <Button
-              color="info"
-              onClick={() => viewTrip(item)}
-            >
-              View
-            </Button>
+            <Button color="info" onClick={() => viewTrip(item)}>View</Button>
           </span>
         )}
       </ListGroupItem>
@@ -279,7 +275,7 @@ const App = () => {
     <div>
       <main>
         <Container>
-          <h1 className="text-white text-center my-4">Trip Manager</h1>
+          <h1 className="text-black text-center my-4">Trip Manager</h1>
           <Row>
             <Col className="mx-auto p-0 card-container">
               <Card>
@@ -319,7 +315,7 @@ const App = () => {
                       <br />
                       <Logout onLogoutSuccess={handleLogoutSuccess} />
                       {modal && activeItem !== undefined && (
-                        <Modal
+                        <CustomModal
                           toggle={toggleModal}
                           modalMode={modalMode}
                           activeItem={activeItem}
@@ -336,6 +332,16 @@ const App = () => {
                           alerts={alerts}
                         />
                       )}
+                      <Modal isOpen={selectedTripForDeletion !== null} toggle={() => setSelectedTripForDeletion(null)}>
+                        <ModalHeader toggle={() => setSelectedTripForDeletion(null)}>Confirm Deletion</ModalHeader>
+                        <ModalBody>
+                          Are you sure you want to delete this trip: {selectedTripForDeletion?.trip_name}?
+                        </ModalBody>
+                        <ModalFooter>
+                          <Button color="danger" onClick={confirmDelete}>Confirm Delete</Button>{' '}
+                          <Button color="secondary" onClick={() => setSelectedTripForDeletion(null)}>Cancel</Button>
+                        </ModalFooter>
+                      </Modal>
                     </MapProvider>
                   )}
                 </CardBody>
