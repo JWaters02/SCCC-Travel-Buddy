@@ -9,6 +9,11 @@ import {
     FormGroup,
     Input,
     Label,
+    Card,
+    CardBody,
+    CardText,
+    Row,
+    Col,
 } from "reactstrap";
 import Map from "./Map";
 import { ErrorMessagesDisplay, WarningMessageDisplay, SuccessMessageDisplay } from "./AlertDisplays";
@@ -121,6 +126,23 @@ const CustomModal = ({ modalMode, activeItem, setActiveItem, toggle, onSave, isP
         //console.log("Map loaded!", map);
     };
 
+    const formatWeatherDetails = (weatherData) => {
+        if (!weatherData || Object.keys(weatherData).length === 0) {
+            return "Weather data is not available.";
+        }
+        return (
+            <Card>
+                <CardBody>
+                    <CardText>Description: {weatherData.description}</CardText>
+                    <CardText>Temperature: {weatherData.temp}°C</CardText>
+                    <CardText>Feels Like: {weatherData.feels_like}°C</CardText>
+                    <CardText>Humidity: {weatherData.humidity}%</CardText>
+                    <CardText>Wind Speed: {weatherData.wind_speed}km/h</CardText>
+                </CardBody>
+            </Card>
+        );
+    };
+
     return (
         <Modal isOpen={true} toggle={toggle}>
             <ModalHeader toggle={toggle}>Trips</ModalHeader>
@@ -194,50 +216,70 @@ const CustomModal = ({ modalMode, activeItem, setActiveItem, toggle, onSave, isP
                         viewOnly={viewOnly}
                         center={center}
                     />
-                    <FormGroup>
-                        <Label for="trip-latitude">Latitude</Label>
-                        <Input
-                            type="number"
-                            id="trip-latitude"
-                            name="latitude"
-                            disabled={!coordsSet || viewOnly}
-                            value={activeItem.latitude}
-                            onChange={handleChange}
-                            placeholder="Place a marker on the map">
-                        </Input>
-                    </FormGroup>
-                    <FormGroup>
-                        <Label for="trip-longitude">Longitude</Label>
-                        <Input
-                            type="number"
-                            id="trip-longitude"
-                            name="longitude"
-                            disabled={!coordsSet || viewOnly}
-                            value={activeItem.longitude}
-                            onChange={handleChange}
-                            placeholder="Place a marker on the map">
-                        </Input>
-                    </FormGroup>
+                    {modalMode !== "View" && (
+                        <FormGroup>
+                            <Label for="trip-latitude">Latitude</Label>
+                            <Input
+                                type="number"
+                                id="trip-latitude"
+                                name="latitude"
+                                disabled={!coordsSet || viewOnly}
+                                value={activeItem.latitude}
+                                onChange={handleChange}
+                                placeholder="Place a marker on the map">
+                            </Input>
+                        </FormGroup>
+                    )}
+                    {modalMode !== "View" && (
+                        <FormGroup>
+                            <Label for="trip-longitude">Longitude</Label>
+                            <Input
+                                type="number"
+                                id="trip-longitude"
+                                name="longitude"
+                                disabled={!coordsSet || viewOnly}
+                                value={activeItem.longitude}
+                                onChange={handleChange}
+                                placeholder="Place a marker on the map">
+                            </Input>
+                        </FormGroup>
+                    )}
+                    {modalMode === "View" && (
+                        <FormGroup>
+                            <br />
+                            <Label for="trip-weather">Weather Forcast</Label>
+                            {formatWeatherDetails(activeItem.weather_forcast)}
+                        </FormGroup>
+                    )}
                 </Form>
             </ModalBody>
             <ModalFooter>
-                {!viewOnly && (
-                    <Button
-                        color="success"
-                        onClick={() => onSave(activeItem)}
-                        disabled={!canSubmit()}
-                    >
-                        Save
-                    </Button>
-                )}
-                {viewOnly && !isPastDate(activeItem.end_date) && (
-                    <Button
-                        color="success"
-                        onClick={() => onInterested(activeItem)}
-                    >
-                        Register interest
-                    </Button>
-                )}
+                <Row className="w-100">
+                    <Col md="6" className="d-flex align-items-center">
+                        {viewOnly && !isPastDate(activeItem.end_date) && (
+                            <span>{activeItem.interests} Interests</span>
+                        )}
+                    </Col>
+                    <Col md="6" className="text-right">
+                        {!viewOnly && (
+                            <Button
+                                color="success"
+                                onClick={() => onSave(activeItem)}
+                                disabled={!canSubmit()}
+                            >
+                                Save
+                            </Button>
+                        )}
+                        {viewOnly && !isPastDate(activeItem.end_date) && (
+                            <Button
+                                color="success"
+                                onClick={() => onInterested(activeItem)}
+                            >
+                                Register interest
+                            </Button>
+                        )}
+                    </Col>
+                </Row>
                 <br />
                 {alerts.errorMessage && <ErrorMessagesDisplay errorMessages={[alerts.errorMessage]} />}
                 {alerts.warningMessage && <WarningMessageDisplay warningMessages={[alerts.warningMessage]} />}

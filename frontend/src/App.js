@@ -284,7 +284,7 @@ const App = () => {
                           </DropdownMenu>
                         </Dropdown>
                         <Button color="info" onClick={toggleEndedTrips} className="ml-2">
-                          {showEndedTrips ? 'Hide Ended Trips' : 'Show Ended Trips'}
+                          {showEndedTrips ? 'Hide ended trips' : 'Show ended trips'}
                         </Button>
                       </div>
                       <ul className="list-group list-group-flush border-top-0">

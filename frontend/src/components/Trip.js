@@ -37,6 +37,7 @@ const Trip = ({ trip, isPastDate, editTrip, handleDelete, viewTrip, userDetails,
                     <strong>{trip.trip_name}</strong> - {trip.location}<br />
                     Start: {formattedDate(trip.start_date)}<br />
                     End: {formattedDate(trip.end_date)} <br />
+                    Interests: {trip.interests}<br />
                     Weather forecast: {weatherDescription(trip.weather_forcast)}
                     <Button id={`Popover-${trip.trip_id}`} type="button" color="link" className="p-0 ml-1" onClick={() => togglePopover(trip.trip_id)}>
                         <FontAwesomeIcon icon={faQuestionCircle} />
@@ -62,7 +63,7 @@ const Trip = ({ trip, isPastDate, editTrip, handleDelete, viewTrip, userDetails,
                         <Button color="danger" className="mr-2 mb-2 mb-md-0" onClick={() => handleDelete(trip)}>Delete</Button>
                     )}
                     {userDetails.id !== trip.user_id && (
-                        <Button color="info" className="mr-2 mb-2 mb-md-0" onClick={() => viewTrip(trip)}>View</Button>
+                        <Button color="info" className="mr-2 mb-2 mb-md-0" onClick={() => viewTrip(trip)}>More details</Button>
                     )}
                 </div>
             </CardBody>
