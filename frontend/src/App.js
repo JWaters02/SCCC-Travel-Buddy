@@ -266,8 +266,7 @@ const App = () => {
                   ) : (
                     <MapProvider>
                       <div className="mb-4">
-                        <p>Current Date: {currentDate}</p>
-                        <p>Welcome {userDetails.username}!</p>
+                        <p className="my-4">Welcome {userDetails.username}!</p>
                         <Button color="primary" onClick={createTrip}>
                           Add trip
                         </Button>
