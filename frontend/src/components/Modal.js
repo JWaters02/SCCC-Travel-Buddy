@@ -17,16 +17,21 @@ const CustomModal = ({ modalMode, activeItem, setActiveItem, toggle, onSave }) =
     const [coordsSet, setCoordsSet] = useState(false);
     const [viewOnly, setViewOnly] = useState(false);
     const [center, setCenter] = useState({ lat: 52.954, lng: -1.252 });
+    const [setId, setSetId] = useState(false);
 
     useEffect(() => {
         switch (modalMode) {
             case "Create":
+                if (setId) {
+                    break;
+                }
                 getUUID()
                 .then((uuid) => {
                     setActiveItem(prevActiveItem => ({
                         ...prevActiveItem,
                         trip_id: uuid["uuid"],
                     }));
+                    setSetId(true);
                 })
                 .catch((error) => {
                     setActiveItem(prevActiveItem => ({

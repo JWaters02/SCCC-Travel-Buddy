@@ -232,7 +232,6 @@ const App = () => {
         <MapProvider>
           <main>
             <Container>
-              <Logout onLogoutSuccess={handleLogoutSuccess} />
               <h1 className="text-white text-center my-4">Trip Manager</h1>
               <Row>
                 <Col md="6" sm="10" className="mx-auto p-0">
@@ -263,18 +262,25 @@ const App = () => {
                       <ul className="list-group list-group-flush border-top-0">
                         {filteredTrips.map(renderTripItems)}
                       </ul>
+                      <br />
+                      <Logout onLogoutSuccess={handleLogoutSuccess}/>
                     </CardBody>
                   </Card>
                 </Col>
               </Row>
               {modal && activeItem !== undefined && (
                 <Modal
-                  key={modalMode ? 'create-modal' : 'edit-modal'}
                   toggle={toggleModal}
                   modalMode={modalMode}
                   activeItem={activeItem}
                   setActiveItem={setActiveItem}
-                  onSave={modalMode ? handleAddTrip : handleEditTrip}
+                  onSave={() => {
+                    if (modalMode === "Create") {
+                      handleAddTrip(activeItem);
+                    } else if (modalMode === "Edit") {
+                      handleEditTrip(activeItem);
+                    }
+                  }}
                 />
               )}
             </Container>
