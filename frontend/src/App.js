@@ -277,20 +277,20 @@ const App = () => {
 
   return (
     <div>
-      {!isLoggedIn ? (
-        <Landing
-          onLoginSuccess={handleLoginSuccess}
-          onRegisterSuccess={handleLoginSuccess}
-        />
-      ) : (
-        <MapProvider>
-          <main>
-            <Container>
-              <h1 className="text-white text-center my-4">Trip Manager</h1>
-              <Row>
-                <Col md="6" sm="10" className="mx-auto p-0">
-                  <Card>
-                    <CardBody>
+      <main>
+        <Container>
+          <h1 className="text-white text-center my-4">Trip Manager</h1>
+          <Row>
+            <Col className="mx-auto p-0 card-container">
+              <Card>
+                <CardBody>
+                  {!isLoggedIn ? (
+                    <Landing
+                      onLoginSuccess={handleLoginSuccess}
+                      onRegisterSuccess={handleLoginSuccess}
+                    />
+                  ) : (
+                    <MapProvider>
                       <div className="mb-4">
                         <p>Current Date: {currentDate}</p>
                         <p>Welcome {userDetails.username}!</p>
@@ -318,32 +318,32 @@ const App = () => {
                       </ul>
                       <br />
                       <Logout onLogoutSuccess={handleLogoutSuccess} />
-                    </CardBody>
-                  </Card>
-                </Col>
-              </Row>
-              {modal && activeItem !== undefined && (
-                <Modal
-                  toggle={toggleModal}
-                  modalMode={modalMode}
-                  activeItem={activeItem}
-                  setActiveItem={setActiveItem}
-                  onSave={() => {
-                    if (modalMode === "Create") {
-                      handleAddTrip(activeItem);
-                    } else if (modalMode === "Edit") {
-                      handleEditTrip(activeItem);
-                    }
-                  }}
-                  isPastDate={isPastDate}
-                  onInterested={handleRegisterInterest}
-                  alerts={alerts}
-                />
-              )}
-            </Container>
-          </main>
-        </MapProvider>
-      )}
+                      {modal && activeItem !== undefined && (
+                        <Modal
+                          toggle={toggleModal}
+                          modalMode={modalMode}
+                          activeItem={activeItem}
+                          setActiveItem={setActiveItem}
+                          onSave={() => {
+                            if (modalMode === "Create") {
+                              handleAddTrip(activeItem);
+                            } else if (modalMode === "Edit") {
+                              handleEditTrip(activeItem);
+                            }
+                          }}
+                          isPastDate={isPastDate}
+                          onInterested={handleRegisterInterest}
+                          alerts={alerts}
+                        />
+                      )}
+                    </MapProvider>
+                  )}
+                </CardBody>
+              </Card>
+            </Col>
+          </Row>
+        </Container>
+      </main>
     </div>
   );
 }
