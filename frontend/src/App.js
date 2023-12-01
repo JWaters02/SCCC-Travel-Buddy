@@ -172,19 +172,34 @@ const App = () => {
   };
 
   const editTrip = (item) => {
-    setActiveItem(item);
+    const editedItem = {
+      ...item,
+      start_date: convertToDateTimeLocal(item.start_date),
+      end_date: convertToDateTimeLocal(item.end_date),
+    };
+    setActiveItem(editedItem);
     setModal(true);
     setModalMode("Edit");
   };
 
   const viewTrip = (item) => {
-    setActiveItem(item);
+    const viewedItem = {
+      ...item,
+      start_date: convertToDateTimeLocal(item.start_date),
+      end_date: convertToDateTimeLocal(item.end_date),
+    };
+    setActiveItem(viewedItem);
     setModal(true);
     setModalMode("View");
   };
 
   const isPastDate = (end_date) => {
     return new Date(end_date) < new Date(currentDate);
+  };
+
+  const convertToDateTimeLocal = (isoString) => {
+    const date = new Date(isoString);
+    return date.toISOString().slice(0, 16);
   };
 
   const filteredTrips = trips.filter((trip) => {
