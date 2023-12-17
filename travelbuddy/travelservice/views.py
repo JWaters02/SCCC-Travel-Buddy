@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from .models import Trip, CustomUser
 from .serializers import TripSerializer, UserRegistrationSerializer, UserLoginSerializer, UserListSerializer
-from .utils import get_uuid, get_location
+from .utils import get_or_fetch_uuid, get_location
 from .throttles import UUIDRateThrottle
 import logging
 
@@ -16,7 +16,7 @@ class UUIDView(APIView):
     #throttle_classes = [UUIDRateThrottle]
 
     def get(self, request, format=None):
-        return Response({'uuid': get_uuid()}, status=status.HTTP_200_OK)
+        return Response({'uuid': get_or_fetch_uuid()}, status=status.HTTP_200_OK)
     
 class LocationView(APIView):
     def get(self, request, format=None):

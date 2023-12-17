@@ -3,6 +3,8 @@ from dotenv import load_dotenv
 import requests
 import json
 import logging
+from django.db.models import Max
+from travelservice.models import UUIDCache
 
 load_dotenv()
 logger = logging.getLogger(__name__)
@@ -10,7 +12,7 @@ logger = logging.getLogger(__name__)
 RANDOM_ORG_API_KEY = os.getenv('RANDOM_ORG_API_KEY')
 WEATHER_API_KEY = os.getenv('WEATHER_API_KEY')
 
-def get_uuid():
+def fetch_uuids(n=50):
     url = "https://api.random.org/json-rpc/2/invoke"
     headers = {'Content-Type': 'application/json'}
     payload = {
@@ -18,7 +20,7 @@ def get_uuid():
         "method": "generateUUIDs",
         "params": {
             "apiKey": RANDOM_ORG_API_KEY,
-            "n": 1
+            "n": n
         },
         "id": 15998
     }
@@ -29,7 +31,7 @@ def get_uuid():
         data = response.json()
 
         if 'result' in data and 'random' in data['result'] and 'data' in data['result']['random']:
-            return data['result']['random']['data'][0]
+            return data['result']['random']['data']
         else:
             raise ValueError("Malformed response from random.org")
     
@@ -37,6 +39,23 @@ def get_uuid():
         logger.error(f"Network-related error when contacting random.org: {e}")
     except ValueError as ve:
         logger.error(f"Error in processing random.org response: {ve}")
+
+    return []
+
+def get_or_fetch_uuid():
+    if UUIDCache.objects.count() == 0:
+        logger.info("get_or_fetch_uuid: UUID cache is empty, fetching new UUIDs")
+        new_uuids = fetch_uuids(50)
+        for uuid_str in new_uuids:
+            UUIDCache.objects.create(uuid=uuid_str)
+
+    # Get the latest UUID and delete it from the cache
+    latest_uuid = UUIDCache.objects.aggregate(Max('id'))['id__max']
+    if latest_uuid is not None:
+        logger.info(f"get_or_fetch_uuid: returning UUID {latest_uuid}")
+        uuid_to_return = UUIDCache.objects.get(id=latest_uuid).uuid
+        UUIDCache.objects.get(id=latest_uuid).delete()
+        return uuid_to_return
 
     return None
 

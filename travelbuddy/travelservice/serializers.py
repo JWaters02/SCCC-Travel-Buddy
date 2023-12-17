@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate
 from rest_framework import serializers
 import logging
 from .models import CustomUser, Trip
-from .utils import get_uuid, get_weather, get_location
+from .utils import get_weather
 
 logger = logging.getLogger(__name__)
 

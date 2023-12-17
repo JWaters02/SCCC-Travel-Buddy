@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import CustomUser, Trip
+from .models import CustomUser, Trip, UUIDCache
 
 # Register your models here.
 class CustomUserAdmin(admin.ModelAdmin):
@@ -13,5 +13,6 @@ class TripAdmin(admin.ModelAdmin):
                     'proposed_date', 'start_date', 'end_date', 'weather_forcast', 'interests', 'users_interested')
     readonly_fields = ('trip_id', 'location', 'proposed_date')
 
+admin.site.register(UUIDCache)
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Trip, TripAdmin)
