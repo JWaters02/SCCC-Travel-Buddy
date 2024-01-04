@@ -21,6 +21,10 @@ export const getUUID = async () => {
             await new Promise(resolve => setTimeout(resolve, 1000));
             return getUUID();
         }
+        if (error.response && error.response.status === 500) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            return getUUID();
+        }
         console.error(error);
     }
 };

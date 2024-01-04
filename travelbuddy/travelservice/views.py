@@ -16,7 +16,11 @@ class UUIDView(APIView):
     #throttle_classes = [UUIDRateThrottle]
 
     def get(self, request, format=None):
-        return Response({'uuid': get_or_fetch_uuid()}, status=status.HTTP_200_OK)
+        try:
+            return Response({'uuid': get_or_fetch_uuid()}, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Error in UUIDView: {e}")
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 class LocationView(APIView):
     def get(self, request, format=None):
