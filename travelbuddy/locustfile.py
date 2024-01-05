@@ -7,7 +7,6 @@ global_trip_name = None
 global_trip_id = None
 
 def random_string(length=10):
-    """Generate a random string of fixed length."""
     letters = string.ascii_lowercase
     return ''.join(random.choice(letters) for i in range(length))
 
@@ -102,6 +101,7 @@ class TripActionSet(SequentialTaskSet):
     trip_id = None
     user_id = None
     trip_name = None
+    token = None
 
     def on_start(self):
         self.user_login("testuser", "pass")
@@ -127,7 +127,7 @@ class TripActionSet(SequentialTaskSet):
             "start_date": "2024-01-18T11:11",
             "end_date": "2024-01-19T11:11"
         }
-        with self.client.post(f"api/trips/{self.trip_id}/", json=payload, headers={'Authorization': f'Token {self.token}'}, catch_response=True) as response:
+        with self.client.post(f"api/trips/{self.trip_id}/", json=payload, headers={'Authorization': f'Token {self.token}'}, name="POST /api/trips/[trip_id]/", catch_response=True) as response:
             if response.status_code == 201:
                 self.trip_id = response.json()['trip_id']
             else:
@@ -144,7 +144,7 @@ class TripActionSet(SequentialTaskSet):
 
     @task
     def delete_trip(self):
-        with self.client.delete(f"api/trips/{self.trip_id}/", headers={'Authorization': f'Token {self.token}'}, catch_response=True) as response:
+        with self.client.delete(f"api/trips/{self.trip_id}/", headers={'Authorization': f'Token {self.token}'}, name="DELETE /api/trips/[trip_id]/", catch_response=True) as response:
             if response.status_code == 204:
                 self.trip_id = None
             else:
@@ -159,10 +159,10 @@ class GetTripAction(TaskSet):
             if not response.status_code == 200:
                 response.failure("Failed to get trips")
 
-class WebsiteUser(HttpUser):
-    tasks = [TripActionSet]
-    wait_time = between(1, 5)
+# class WebsiteUser(HttpUser):
+#     tasks = [TripActionSet]
+#     wait_time = between(1, 5)
 
 class TripGetter(HttpUser):
     tasks = [GetTripAction]
-    wait_time = between(1, 1)
+    wait_time = between(1, 5)
